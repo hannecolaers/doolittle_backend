@@ -37,7 +37,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'squad.apps.SquadConfig'
 ]
+
+REST_FRAMEWORK = {
+    'PAGE_SIZE': 10
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -106,7 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC+01:00'
+TIME_ZONE = 'Europe/Brussels'
 
 USE_I18N = True
 
