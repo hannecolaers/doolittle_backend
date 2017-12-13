@@ -37,10 +37,10 @@ class SquadTestCase(APITestCase):
         """
         response = self.client.post('/squads/', {'name': 'OldlyNamedSquad'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, {'id': 8, 'name': 'OldlyNamedSquad'})
-        response = self.client.put('/squads/8/', {'name': 'NewlyNamedSquad'}, format='json')
+        self.assertEqual(response.data, {'id': 7, 'name': 'OldlyNamedSquad'})
+        response = self.client.put('/squads/7/', {'name': 'NewlyNamedSquad'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {'id': 8, 'name': 'NewlyNamedSquad'})
+        self.assertEqual(response.data, {'id': 7, 'name': 'NewlyNamedSquad'})
         
     def test_put_squad_returns_404_when_not_found(self):
         """
