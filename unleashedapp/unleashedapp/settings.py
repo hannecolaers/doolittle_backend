@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'squad.apps.SquadConfig'
+    'squad.apps.SquadConfig',
+    'employees'
 ]
 
 REST_FRAMEWORK = {
