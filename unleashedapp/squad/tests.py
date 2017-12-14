@@ -23,7 +23,7 @@ class SquadTestCase(APITestCase):
         """
         self.squad = Squad.objects.create(name = "TestSquad")
         serializer = create_serializer(self.squad, '')
-        self.assertEquals(set(serializer.data.keys()), {'id', 'name'})
+        self.assertSetEqual(set(serializer.data.keys()), {'id', 'name'})
     
     def test_squad_serializer_id_name_field_content(self):
         """
@@ -89,7 +89,7 @@ class SquadTestCase(APITestCase):
         
     def test_put_squad_returns_404_when_not_found(self):
         """
-        A PUT request on /squads/<id> should return a 404 when using an invalid id
+        A PUT request on /squads/<id>/ should return a 404 when using an invalid id
         """
         response = self.client.put('/squads/957/', {'name': 'NewlyNamedSquad'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
