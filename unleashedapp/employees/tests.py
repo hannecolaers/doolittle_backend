@@ -27,6 +27,16 @@ class EmployeeTest(TestCase):
             visible_site=True,
             habitat='testHabitat'
         )
+        self.employee_json = {
+            "first_name": "test",
+            "last_name": "test",
+            "function": "testFunctie",
+            "start_date": "2017-12-13",
+            "visible_site": False,
+            "habitat": None
+        }
+        self.url_with_id = reverse('employee-detail', args=[self.employee.id])
+        self.url_absolute_with_id = 'http://testserver/employees/' + str(self.employee.id) + '/'
 
     """ 
         Test serializer 
@@ -37,18 +47,17 @@ class EmployeeTest(TestCase):
             Ensure the serializer contains the expected fields
         """
         serializer = create_serializer(self.employee, '/test')
-        self.assertEquals(set(serializer.data.keys()),
-                          {'url', 'id', 'first_name', 'last_name', 'function', 'start_date',
-                           'end_date', 'visible_site', 'habitat'}
-                          )
+        self.assertSetEqual(set(serializer.data.keys()),
+                            {'url', 'id', 'first_name', 'last_name', 'function', 'start_date',
+                             'end_date', 'visible_site', 'habitat'}
+                            )
 
     def test_serializer_url_field_content(self):
         """
             Ensure that the url field contains the expected data
         """
         serializer = create_serializer(self.employee, '')
-        url = 'http://testserver/employees/' + str(self.employee.id) + '/'
-        self.assertEqual(serializer.data['url'], url)
+        self.assertEqual(serializer.data['url'], self.url_absolute_with_id)
 
     def test_serializer_id_field_content(self):
         """
@@ -133,9 +142,8 @@ class EmployeeTest(TestCase):
         """
             Ensure we can get an employee by id
         """
-        url = reverse('employee-detail', args=[self.employee.id])
-        serializer = create_serializer(self.employee, url)
-        response = self.client.get(url, format="json")
+        serializer = create_serializer(self.employee, self.url_with_id)
+        response = self.client.get(self.url_with_id, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, serializer.data)
 
@@ -149,18 +157,11 @@ class EmployeeTest(TestCase):
 
     def test_post_employee(self):
         """
-            Ensure we can post an employee
+            Ensure we can post an employee and ensure an id is added
         """
-        employee_json = {
-            'first_name': 'testVoornaam',
-            'last_name': 'testAchternaam',
-            'function': 'testFunctie',
-            'start_date': '2017-12-08',
-            'visible_site': '1',
-            'habitat': 'testHabitat'
-        }
-        response = self.client.post('/employees/', employee_json, format="json")
+        response = self.client.post('/employees/', self.employee_json, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIn("id", response.data)
 
     def test_post_invalid_date(self):
         """
@@ -184,7 +185,7 @@ class EmployeeTest(TestCase):
         employee_json = {
             'last_name': 'testAchternaam',
             'function': 'testFunctie',
-            'start_date': 'xx',
+            'start_date': '2017-12-08',
             'visible_site': '1',
             'habitat': 'testHabitat'
         }
@@ -198,12 +199,190 @@ class EmployeeTest(TestCase):
         """
             Ensure a post to employess/id/ return 405 method not allowed
         """
+        response = self.client.post(self.url_with_id, self.employee_json, format="json")
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_put_employee_update(self):
+        """
+            Ensure an employee can be updated with a PUT request
+        """
+        response = self.client.put(self.url_with_id, self.employee_json, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_put_invalid_id(self):
+        """
+            Ensure that a PUT request with an invalid id in url returns a 404 not found
+        """
+        url = reverse('employee-detail', args=['x'])
+        response = self.client.put(url, self.employee_json, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_put_nonexisting_id(self):
+        """
+            Ensure that a PUT request with a non existing id in url returns a 404 not found
+        """
+        url = reverse('employee-detail', args=[999])
+        response = self.client.put(url, self.employee_json, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_put_negative_id(self):
+        """
+            Ensure that a PUT request with a negative id in url returns a 404 not found
+        """
+        url = reverse('employee-detail', args=[-10])
+        response = self.client.put(url, self.employee_json, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_put_empty_body(self):
+        """
+            Ensure that a PUT request with an empty body returns a 400 bad request
+        """
+        url = reverse('employee-detail', args=[self.employee.id])
+        response = self.client.put(url, '{}', format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_put_invalid(self):
+        """
+            Ensure that a PUT request with invalid data returns a 400 bad request
+        """
         employee_json = {
+            'first_name': 'testVoornaam',
             'last_name': 'testAchternaam',
             'function': 'testFunctie',
             'start_date': 'xx',
             'visible_site': '1',
             'habitat': 'testHabitat'
         }
-        response = self.client.post('/employees/1/', employee_json, format="json")
+        url = reverse('employee-detail', args=[self.employee.id])
+        response = self.client.put(url, employee_json, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_put_missing_required_field(self):
+        """
+            Ensure that a PUT request with a missing required field returns a 400 bad request
+        """
+        employee_json = {
+            'last_name': 'testAchternaam',
+            'function': 'testFunctie',
+            'start_date': '2017-2-2',
+            'visible_site': '1',
+            'habitat': 'testHabitat'
+        }
+        url = reverse('employee-detail', args=[self.employee.id])
+        response = self.client.put(url, employee_json, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_put_employee_list(self):
+        """
+            Ensure a PUT request to /employees/ returns a 405 not allowed
+        """
+        url = reverse('employee-list')
+        response = self.client.put(url, self.employee_json, format="json")
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_patch_employee_update(self):
+        """
+            Ensure an employee can be updated with a PATCH request
+        """
+        response = self.client.patch(self.url_with_id, self.employee_json, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_patch_employee_update_partial(self):
+        """
+            Ensure a certain field of an employee can be updated with a PATCH request
+        """
+        employee_json = {
+            'last_name': 'testAchternaam',
+        }
+        response = self.client.patch(self.url_with_id, employee_json, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_patch_invalid_id(self):
+        """
+            Ensure that a PATCH request with an invalid id in url returns a 404 not found
+        """
+        url = reverse('employee-detail', args=['x'])
+        response = self.client.patch(url, self.employee_json, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_patch_nonexisting_id(self):
+        """
+            Ensure that a PATCH request with a non existing id in url returns a 404 not found
+        """
+        url = reverse('employee-detail', args=[999])
+        response = self.client.patch(url, self.employee_json, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_patch_negative_id(self):
+        """
+            Ensure that a PATCH request with a negative id in url returns a 404 not found
+        """
+        url = reverse('employee-detail', args=[-10])
+        response = self.client.patch(url, self.employee_json, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_patch_empty_body(self):
+        """
+            Ensure that a PATCH request with an empty body returns a 400 bad request
+        """
+        url = reverse('employee-detail', args=[self.employee.id])
+        response = self.client.patch(url, '{}', format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_patch_invalid(self):
+        """
+            Ensure that a PATCH request with invalid data returns a 400 bad request
+        """
+        employee_json = {
+            'start_date': 'xx'
+        }
+        url = reverse('employee-detail', args=[self.employee.id])
+        response = self.client.patch(url, employee_json, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_patch_employee_list(self):
+        """
+            Ensure a PATCH request to /employees/ returns a 405 not allowed
+        """
+        url = reverse('employee-list')
+        response = self.client.patch(url, self.employee_json, format="json")
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_delete_employee(self):
+        """
+            Ensure a DELETE request of a valid employee id returns 200 OK
+        """
+        response = self.client.delete(self.url_with_id)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_delete_invalid_id(self):
+        """
+            Ensure that a DELETE request with an invalid id in url returns a 404 not found
+        """
+        url = reverse('employee-detail', args=['x'])
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_nonexisting_id(self):
+        """
+            Ensure that a DELETE request with a non existing id in url returns a 404 not found
+        """
+        url = reverse('employee-detail', args=[999])
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_negative_id(self):
+        """
+            Ensure that a DELETE request with a negative id in url returns a 404 not found
+        """
+        url = reverse('employee-detail', args=[-10])
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_employee_list(self):
+        """
+            Ensure a DELETE request to /employees/ returns a 405 not allowed
+        """
+        url = reverse('employee-list')
+        response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
