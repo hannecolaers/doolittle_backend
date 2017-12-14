@@ -29,6 +29,7 @@ class SpaceSerializer(serializers.Serializer):
     class Meta:
         model = Space
         fields = ('url', 'x', 'y', 'employee_id', 'room_id')
+        unique_together = (("x", "y"),)
 
     x = serializers.IntegerField(label='x')
     y = serializers.IntegerField(label='y')
