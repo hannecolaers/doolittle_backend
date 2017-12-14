@@ -10,13 +10,3 @@ class SquadViewSet(viewsets.ModelViewSet):
     """
     queryset = Squad.objects.all()
     serializer_class = SquadSerializer
-
-    def get_object(self):
-        if self.request.method == 'PUT':
-            squad = Squad.objects.filter(id=self.kwargs.get('pk')).first()
-            if squad:
-                return squad
-            else:
-                return Squad(id=self.kwargs.get('pk'))
-        else:
-            return super(SquadViewSet, self).get_object()

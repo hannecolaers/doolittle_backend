@@ -82,23 +82,26 @@ class SquadTestCase(APITestCase):
         """
         response = self.client.post('/squads/', {'name': 'OldlyNamedSquad'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, {'id': 57, 'name': 'OldlyNamedSquad'})
-        response = self.client.put('/squads/57/', {'name': 'NewlyNamedSquad'}, format='json')
+        self.assertEqual(response.data, {'id': 7, 'name': 'OldlyNamedSquad'})
+        response = self.client.put('/squads/7/', {'name': 'NewlyNamedSquad'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {'id': 57, 'name': 'NewlyNamedSquad'})
+        self.assertEqual(response.data, {'id': 7, 'name': 'NewlyNamedSquad'})
         
-    def test_put_squad_returns_200_when_created(self):
+    def test_put_squad_returns_404_when_not_found(self):
         """
-        A PUT request on /squads/<id>/ should create when non found
+        A PUT request on /squads/<id> should return a 404 when using an invalid id
         """
-        response = self.client.put('/squads/56/', {'name': 'PutNamedSquad'}, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.put('/squads/957/', {'name': 'NewlyNamedSquad'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         
     def test_put_squad_returns_400_when_bad_format(self):
         """
-        A PUT request on /squads/<id>/ should return a 404 when using an invalid format
+        A PUT request on /squads/<id>/ should return an updated squad
         """
-        response = self.client.put('/squads/957/', {'title': 'NewlyNamedSquad'}, format='json')
+        response = self.client.post('/squads/', {'name': 'OldlyNamedExtraSquad'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data, {'id': 8, 'name': 'OldlyNamedExtraSquad'})
+        response = self.client.put('/squads/8/', {'title': 'NewlyNamedExtraSquad'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         
     def test_delete_squad_returns_204_when_deleting(self):
