@@ -40,9 +40,26 @@ DATABASES = {
 }
 ```
 
+Update database:
+```
+python manage.py makemigrations
+python manage.py migrate
+```
+
 ## Run server
 To be executed in a command prompt within the virtual environment ```env``` to run the server on ```http://localhost:8000/```.
 
 ```
 python manage.py runserver
+```
+
+## Run coverage
+```
+coverage run manage.py test
+coverage report
+```
+
+html report:
+```
+coverage html
 ```
