@@ -198,3 +198,53 @@ class HabitatTestCase(APITestCase):
         """
         response = self.client.delete('/habitats/')
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    """
+    Tests for the /habitats/<id>/employees/ path
+    """
+    def test_get_habitat_employees_returns_20_when_not_found(self):
+        """
+        A GET request on /habitats/<id>/employees/ should return a 200 error
+        when the habitat doesn't exist, because you request the users in that habitat
+        """
+        response = self.client.get('/habitats/999/employees/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+    def test_post_habitat_employees_returns_405(self):
+        """
+        A POST request on /habitats/<id>/employees/ should not be possible
+        """
+        data = {'name': 'NewHabitat'}
+        response = self.client.post('/habitats/1/employees/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        
+    def test_put_habitat_employees_returns_405(self):
+        """
+        A PUT request on /habitats/<id>/employees/ should not be possible
+        """
+        response = self.client.put('/habitats/1/employees/')
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        
+    def test_patch_habitat_employees_returns_405(self):
+        """
+        A PATCH request on /habitats/<id>/employees/ should not be possible
+        """
+        response = self.client.patch('/habitats/1/employees/')
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        
+    def test_delete_habitat_employees_returns_405(self):
+        """
+        A DELETE request on /habitats/<id>/employees/ should not be possible
+        """
+        response = self.client.delete('/habitats/1/employees/')
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_get_habitat_returns_200_when_found(self):
+        """
+        A GET request on /habitats/<id>/employees/ should return a list of employees
+        """
+        response = self.client.post('/habitats/', {'name': 'Employbitat'}, format='json')
+        response = self.client.post('/employees/', {"first_name": "Firstname", "last_name": "Lastname", "function": "Person", "start_date": "2017-12-13", "visible_site": False, "habitat": 4}, format='json')
+        response = self.client.post('/employees/', {"first_name": "Newname", "last_name": "Oldname", "function": "Developer", "start_date": "2017-12-13", "visible_site": False, "habitat": 4}, format='json')
+        response = self.client.get('/habitats/4/employees/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
