@@ -82,10 +82,10 @@ class SquadTestCase(APITestCase):
         """
         response = self.client.post('/squads/', {'name': 'OldlyNamedSquad'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, {'id': 7, 'name': 'OldlyNamedSquad'})
-        response = self.client.put('/squads/7/', {'name': 'NewlyNamedSquad'}, format='json')
+        self.assertEqual(response.data, {'id': 8, 'name': 'OldlyNamedSquad'})
+        response = self.client.put('/squads/8/', {'name': 'NewlyNamedSquad'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {'id': 7, 'name': 'NewlyNamedSquad'})
+        self.assertEqual(response.data, {'id': 8, 'name': 'NewlyNamedSquad'})
         
     def test_put_squad_returns_404_when_not_found(self):
         """
@@ -100,8 +100,8 @@ class SquadTestCase(APITestCase):
         """
         response = self.client.post('/squads/', {'name': 'OldlyNamedExtraSquad'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, {'id': 8, 'name': 'OldlyNamedExtraSquad'})
-        response = self.client.put('/squads/8/', {'title': 'NewlyNamedExtraSquad'}, format='json')
+        self.assertEqual(response.data, {'id': 9, 'name': 'OldlyNamedExtraSquad'})
+        response = self.client.put('/squads/9/', {'title': 'NewlyNamedExtraSquad'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         
     def test_delete_squad_returns_204_when_deleting(self):
@@ -131,6 +131,16 @@ class SquadTestCase(APITestCase):
         response = self.client.patch('/squads/5/', {'name': 'NewlyPatchedSquad'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {'id': 5, 'name': 'NewlyPatchedSquad'})
+        
+    def test_patch_squad_returns_404_when_bad_request(self):
+        """
+        A PATCH request on /squads/<id>/ should return an updated squad
+        """
+        response = self.client.post('/squads/', {'name': 'BrokenSquad'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data, {'id': 6, 'name': 'BrokenSquad'})
+        response = self.client.patch('/squads/6/', {'name': None}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         
     def test_patch_squad_returns_404_when_not_found(self):
         """

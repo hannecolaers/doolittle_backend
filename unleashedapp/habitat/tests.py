@@ -82,10 +82,10 @@ class HabitatTestCase(APITestCase):
         """
         response = self.client.post('/habitats/', {'name': 'OldlyNamedHabitat'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, {'id': 10, 'name': 'OldlyNamedHabitat'})
-        response = self.client.put('/habitats/10/', {'name': 'NewlyNamedHabitat'}, format='json')
+        self.assertEqual(response.data, {'id': 11, 'name': 'OldlyNamedHabitat'})
+        response = self.client.put('/habitats/11/', {'name': 'NewlyNamedHabitat'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {'id': 10, 'name': 'NewlyNamedHabitat'})
+        self.assertEqual(response.data, {'id': 11, 'name': 'NewlyNamedHabitat'})
         
     def test_put_habitat_returns_404_when_not_found(self):
         """
@@ -100,8 +100,8 @@ class HabitatTestCase(APITestCase):
         """
         response = self.client.post('/habitats/', {'name': 'OldlyNamedExtraHabitat'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, {'id': 11, 'name': 'OldlyNamedExtraHabitat'})
-        response = self.client.put('/habitats/11/', {'title': 'NewlyNamedExtraHabitat'}, format='json')
+        self.assertEqual(response.data, {'id': 12, 'name': 'OldlyNamedExtraHabitat'})
+        response = self.client.put('/habitats/12/', {'title': 'NewlyNamedExtraHabitat'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         
     def test_delete_habitat_returns_204_when_deleting(self):
@@ -131,6 +131,16 @@ class HabitatTestCase(APITestCase):
         response = self.client.patch('/habitats/8/', {'name': 'NewlyPatchedHabitat'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {'id': 8, 'name': 'NewlyPatchedHabitat'})
+        
+    def test_patch_habitat_returns_400_when_bad_format(self):
+        """
+        A PATCH request on /habitats/<id>/ should return an updated habitat
+        """
+        response = self.client.post('/habitats/', {'name': 'BrokenPatchHabitat'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data, {'id': 9, 'name': 'BrokenPatchHabitat'})
+        response = self.client.patch('/habitats/9/', {'name': None}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         
     def test_patch_habitat_returns_404_when_not_found(self):
         """
