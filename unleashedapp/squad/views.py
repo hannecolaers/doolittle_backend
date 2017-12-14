@@ -10,10 +10,3 @@ class SquadList(viewsets.ModelViewSet):
     """
     queryset = Squad.objects.all()
     serializer_class = SquadSerializer
-
-class SquadDetail(viewsets.ModelViewSet):
-    """
-    Retrieve, update or delete a squad.
-    """
-    queryset = Squad.objects.all()
-    serializer_class = SquadSerializer

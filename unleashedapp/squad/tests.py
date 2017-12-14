@@ -1,9 +1,54 @@
-from squad.models import Squad
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APITestCase, APIClient, APIRequestFactory
+
+from squad.models import Squad
+from squad.serializers import SquadSerializer
+
+def create_serializer(data, url, many = False):
+    request = APIRequestFactory().get(url)
+    serializer = SquadSerializer(data, many = many, context = {'request': request})
+    return serializer
 
 class SquadTestCase(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+    """
+    Tests for SquadSerializer
+    """
+    def test_squad_serializer_expected_fields(self):
+        """
+        The serializer should only expect and accept the fields that have been set
+        """
+        self.squad = Squad.objects.create(name = "TestSquad")
+        serializer = create_serializer(self.squad, '')
+        self.assertEquals(set(serializer.data.keys()), {'id', 'name'})
+    
+    def test_squad_serializer_id_name_field_content(self):
+        """
+        The name field of a squad should contain a name
+        """
+        self.squad = Squad.objects.create(name = "TestSquad")
+        serializer = create_serializer(self.squad, '')
+        self.assertEqual(serializer.data['id'], self.squad.id)
+    
+    def test_squad_serializer_name_field_content(self):
+        """
+        The name field of a squad should contain a name
+        """
+        self.squad = Squad.objects.create(name = "TestSquad")
+        serializer = create_serializer(self.squad, '')
+        self.assertEqual(serializer.data['name'], self.squad.name)
+
+    def test_squad_serializer_returns_empty_when_no_squads(self):
+        """
+        The serializer should return [] when no objects are given
+        """
+        squad = Squad.objects.none()
+        serialzer = create_serializer(squad, '/', many = True)
+        self.assertEqual(serialzer.data, [])
+
     """
     Tests for the /squads/<id> path
     """
