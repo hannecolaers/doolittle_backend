@@ -1,9 +1,11 @@
 # Requirements for running the test suite.
 # Always pin versions to make sure we don't get conflicts.
 
-# mypy for checking validity of type annotations
-mypy==0.550
-typed-ast==1.1.
+# Coverage uploads
+coveralls==1.2.0
+coverage==4.4.2
+docopt==0.6.2
+pytest-cov==2.5.1
 
 # Flake8 checks for PEP-8 formatting and code quality
 flake8==3.5.0
