@@ -50,11 +50,11 @@ class SquadTestCase(APITestCase):
         self.assertEqual(serialzer.data, [])
 
     """
-    Tests for the /squads/<id> path
+    Tests for the /squads/<id>/ path
     """
     def test_get_squad_returns_200_when_found(self):
         """
-        A GET request on /squads/<id> should return a squad
+        A GET request on /squads/<id>/ should return a squad
         """
         response = self.client.post('/squads/', {'name': 'FirstSquad'}, format='json')
         response = self.client.get('/squads/4/')
@@ -63,14 +63,14 @@ class SquadTestCase(APITestCase):
         
     def test_get_squad_returns_404_when_not_found(self):
         """
-        A GET request on /squads/<id> should return a 404 error when the squad doesn't exist
+        A GET request on /squads/<id>/ should return a 404 error when the squad doesn't exist
         """
         response = self.client.get('/squads/999/')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         
     def test_post_squad_returns_405(self):
         """
-        A POST request on /squads/<id> should not be possible
+        A POST request on /squads/<id>/ should not be possible
         """
         data = {'name': 'NewSquad'}
         response = self.client.post('/squads/4/', data, format='json')
@@ -78,25 +78,32 @@ class SquadTestCase(APITestCase):
         
     def test_put_squad_returns_200_when_updated(self):
         """
-        A PUT request on /squads/<id> should return an updated squad
+        A PUT request on /squads/<id>/ should return an updated squad
         """
         response = self.client.post('/squads/', {'name': 'OldlyNamedSquad'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, {'id': 7, 'name': 'OldlyNamedSquad'})
-        response = self.client.put('/squads/7/', {'name': 'NewlyNamedSquad'}, format='json')
+        self.assertEqual(response.data, {'id': 57, 'name': 'OldlyNamedSquad'})
+        response = self.client.put('/squads/57/', {'name': 'NewlyNamedSquad'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {'id': 7, 'name': 'NewlyNamedSquad'})
+        self.assertEqual(response.data, {'id': 57, 'name': 'NewlyNamedSquad'})
         
-    def test_put_squad_returns_404_when_not_found(self):
+    def test_put_squad_returns_200_when_created(self):
         """
-        A PUT request on /squads/<id> should return a 404 when using an invalid id
+        A PUT request on /squads/<id>/ should create when non found
         """
-        response = self.client.put('/squads/957/', {'name': 'NewlyNamedSquad'}, format='json')
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        response = self.client.put('/squads/56/', {'name': 'PutNamedSquad'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+    def test_put_squad_returns_400_when_bad_format(self):
+        """
+        A PUT request on /squads/<id>/ should return a 404 when using an invalid format
+        """
+        response = self.client.put('/squads/957/', {'title': 'NewlyNamedSquad'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         
     def test_delete_squad_returns_204_when_deleting(self):
         """
-        A DELETE request on /squads/<id> should delete a squad
+        A DELETE request on /squads/<id>/ should delete a squad
         """
         response = self.client.post('/squads/', {'name': 'DeletableSquad'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -106,14 +113,14 @@ class SquadTestCase(APITestCase):
         
     def test_delete_squad_returns_404_when_not_found(self):
         """
-        A DELETE request on /squads/<id> should return 404 when deleting unexisting squad
+        A DELETE request on /squads/<id>/ should return 404 when deleting unexisting squad
         """
         response = self.client.delete('/squads/989/')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         
     def test_patch_squad_returns_200_when_updated(self):
         """
-        A PATCH request on /squads/<id> should return an updated squad
+        A PATCH request on /squads/<id>/ should return an updated squad
         """
         response = self.client.post('/squads/', {'name': 'OldlyPatchedSquad'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -124,7 +131,7 @@ class SquadTestCase(APITestCase):
         
     def test_patch_squad_returns_404_when_not_found(self):
         """
-        A PATCH request on /squads/<id> should return 404 when not found
+        A PATCH request on /squads/<id>/ should return 404 when not found
         """
         response = self.client.patch('/squads/934/', {'name': 'NeverBeFoundSquad'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
