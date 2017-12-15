@@ -6,7 +6,7 @@ from rest_framework import viewsets
 
 class SquadViewSet(viewsets.ModelViewSet):
     """
-    Provide an endpoint for POST, PUT, PATCH, DELETE and GET on /squads/ and /squads/<id>
+    Provide an endpoint for POST, PUT, PATCH, DELETE and GET on /squads/ and /squads/<id>/
     """
     queryset = Squad.objects.all()
     serializer_class = SquadSerializer

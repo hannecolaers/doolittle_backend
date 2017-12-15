@@ -10,7 +10,7 @@ from rest_framework.response import Response
 
 class HabitatViewSet(viewsets.ModelViewSet):
     """
-    Provide an endpoint for POST, PUT, PATCH, DELETE and GET on /habitats/ and /habitats/<id>
+    Provide an endpoint for POST, PUT, PATCH, DELETE and GET on /habitats/ and /habitats/<id>/
     """
     queryset = Habitat.objects.all()
     serializer_class = HabitatSerializer
