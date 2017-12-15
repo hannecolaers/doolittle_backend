@@ -112,7 +112,7 @@ class EmployeeTest(TestCase):
             Ensure that the habitat field contains the expected data
         """
         serializer = create_serializer(self.employee, '')
-        self.assertEqual(serializer.data['habitat'], self.employee.habitat)
+        self.assertEqual(serializer.data['habitat']['name'], 'habitat1')
 
     def test_serializer_empty_object(self):
         """
