@@ -8,6 +8,7 @@ from rest_framework.test import APIClient, APIRequestFactory
 
 from employees.models import Employee
 from employees.serializers import EmployeeSerializer
+from habitat.models import Habitat
 
 
 def create_serializer(data, url, many=False):
@@ -19,13 +20,16 @@ def create_serializer(data, url, many=False):
 class EmployeeTest(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.habitat = Habitat.objects.create(
+            name="habitat1"
+        )
         self.employee = Employee.objects.create(
             first_name='testVoornaam',
             last_name='testAchternaam',
             function='testFunctie',
             start_date=datetime.date.today(),
             visible_site=True,
-            habitat='testHabitat'
+            habitat=self.habitat
         )
         self.employee_json = {
             "first_name": "test",
@@ -33,7 +37,9 @@ class EmployeeTest(TestCase):
             "function": "testFunctie",
             "start_date": "2017-12-13",
             "visible_site": False,
-            "habitat": None
+            "habitat": {
+                "name": "habitat1"
+            }
         }
         self.url_with_id = reverse('employee-detail', args=[self.employee.id])
         self.url_absolute_with_id = 'http://testserver/employees/' + str(self.employee.id) + '/'
@@ -48,16 +54,9 @@ class EmployeeTest(TestCase):
         """
         serializer = create_serializer(self.employee, '/test')
         self.assertSetEqual(set(serializer.data.keys()),
-                            {'url', 'id', 'first_name', 'last_name', 'function', 'start_date',
+                            {'id', 'first_name', 'last_name', 'function', 'start_date',
                              'end_date', 'visible_site', 'habitat'}
                             )
-
-    def test_serializer_url_field_content(self):
-        """
-            Ensure that the url field contains the expected data
-        """
-        serializer = create_serializer(self.employee, '')
-        self.assertEqual(serializer.data['url'], self.url_absolute_with_id)
 
     def test_serializer_id_field_content(self):
         """
@@ -173,27 +172,45 @@ class EmployeeTest(TestCase):
             'function': 'testFunctie',
             'start_date': 'xx',
             'visible_site': '1',
-            'habitat': 'testHabitat'
+            "habitat": {
+                "name": "habitat1"
+            }
         }
         response = self.client.post('/employees/', employee_json, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_post_missing_field(self):
         """
-            Ensure an employee with a missing field returns 400 bad request
+            Ensure a POST request with an employee with a missing field returns 400 bad request
         """
         employee_json = {
             'last_name': 'testAchternaam',
             'function': 'testFunctie',
             'start_date': '2017-12-08',
             'visible_site': '1',
-            'habitat': 'testHabitat'
+            "habitat": {
+                "name": "habitat1"
+            }
         }
         response = self.client.post('/employees/', employee_json, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    # TODO
-    # def test_post_invalid_habitat_fk(self):
+    def test_post_invalid_habitat_fk(self):
+        """
+            Ensure a POST request with an invalid foreign key to a habitat returns 400 bad request
+        """
+        employee_json = {
+            "first_name": "test",
+            "last_name": "test",
+            "function": "testFunctie",
+            "start_date": "2017-12-13",
+            "visible_site": False,
+            "habitat": {
+                "name": "x"
+            }
+        }
+        response = self.client.post('/employees/', employee_json, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_post_to_id(self):
         """
@@ -203,6 +220,13 @@ class EmployeeTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_put_employee_update(self):
+        """
+            Ensure an employee can be updated with a PUT request
+        """
+        response = self.client.put(self.url_with_id, self.employee_json, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_put_employee_change_habitat(self):
         """
             Ensure an employee can be updated with a PUT request
         """
