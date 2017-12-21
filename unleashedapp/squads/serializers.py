@@ -1,5 +1,5 @@
 from rest_framework import serializers, status
-from squad.models import Squad, SquadEmployee
+from squads.models import Squad, SquadEmployee
 from employees.models import Employee
 from employees.serializers import EmployeeSerializer
 from rest_framework.exceptions import APIException

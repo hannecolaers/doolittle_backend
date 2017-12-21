@@ -3,8 +3,8 @@ from rest_framework import serializers, status
 from rest_framework.exceptions import APIException
 
 from employees.models import Employee
-from habitat.models import Habitat
-from habitat.serializers import HabitatSerializer
+from habitats.models import Habitat
+from habitats.serializers import HabitatSerializer
 
 
 class EmployeeSerializer(serializers.HyperlinkedModelSerializer):

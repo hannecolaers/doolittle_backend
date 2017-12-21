@@ -1,7 +1,7 @@
 from django.db import models
 
 # Create your models here.
-from habitat.models import Habitat
+from habitats.models import Habitat
 
 
 class Employee(models.Model):

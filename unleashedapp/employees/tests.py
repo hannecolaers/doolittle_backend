@@ -8,7 +8,7 @@ from rest_framework.test import APIClient, APIRequestFactory
 
 from employees.models import Employee
 from employees.serializers import EmployeeSerializer
-from habitat.models import Habitat
+from habitats.models import Habitat
 
 
 def create_serializer(data, url, many=False):

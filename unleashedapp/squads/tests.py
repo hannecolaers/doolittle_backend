@@ -5,9 +5,9 @@ from rest_framework.test import APITestCase, APIClient, APIRequestFactory
 import datetime
 
 from employees.models import Employee
-from habitat.models import Habitat
-from squad.models import Squad, SquadEmployee
-from squad.serializers import SquadSerializer, SquadEmployeeSerializer
+from habitats.models import Habitat
+from squads.models import Squad, SquadEmployee
+from squads.serializers import SquadSerializer, SquadEmployeeSerializer
 
 def create_squad_serializer(data, url, many = False):
     request = APIRequestFactory().get(url)
@@ -215,3 +215,43 @@ class SquadTestCase(TestCase):
         url = reverse('squad-list')
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+class SquadEmployeeTestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.habitat = Habitat.objects.create(
+            name='HabitatName'
+        )
+        self.employee = Employee.objects.create(
+            first_name='FirstName',
+            last_name='LastName',
+            function='Function',
+            start_date=datetime.date.today(),
+            visible_site=True,
+            habitat=self.habitat
+        )
+        self.squad = Squad.objects.create(
+            name='SquadName'
+        )
+        self.squademployee = SquadEmployee.objects.create(
+            squad = self.squad,
+            employee = self.employee
+        )
+        self.squademployee_json = {
+            "squad": {
+                "name": "SquadName"
+            },
+            "employee": {
+                "first_name": "FirstName",
+                "last_name": "LastName",
+                "function": "Function",
+                "start_date": "2017-12-13",
+                "visible_site": False,
+                "habitat": {
+                    "name": "habitat1"
+                }
+            }
+        }
+        self.url_with_id = reverse('squademployee-detail', args=[self.squademployee.id])
+        self.url_absolute_with_id = 'http://testserver/squadsemployees/' + str(self.squademployee.id) + '/'
+

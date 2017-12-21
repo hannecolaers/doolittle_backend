@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from habitat.models import Habitat
+from habitats.models import Habitat
 
 class HabitatSerializer(serializers.Serializer):
     class Meta:

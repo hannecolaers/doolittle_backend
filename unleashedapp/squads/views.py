@@ -1,6 +1,6 @@
 from rest_framework import generics
-from squad.models import Squad, SquadEmployee
-from squad.serializers import SquadSerializer, SquadEmployeeSerializer, EmployeesInSquadSerializer
+from squads.models import Squad, SquadEmployee
+from squads.serializers import SquadSerializer, SquadEmployeeSerializer, EmployeesInSquadSerializer
 from rest_framework import permissions
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route

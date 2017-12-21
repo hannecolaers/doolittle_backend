@@ -3,8 +3,8 @@ from django.test import TestCase, Client, RequestFactory
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient, APIRequestFactory
 
-from habitat.models import Habitat
-from habitat.serializers import HabitatSerializer
+from habitats.models import Habitat
+from habitats.serializers import HabitatSerializer
 
 def create_serializer(data, url, many = False):
     request = APIRequestFactory().get(url)
