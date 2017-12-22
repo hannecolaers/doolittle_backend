@@ -8,11 +8,11 @@ class Squad(models.Model):
     name = models.TextField(max_length=40)
 
 """
-Model class for SquadEmployee
+Model class for Membership
 """
-class SquadEmployee(models.Model):
+class Membership(models.Model):
     """
-    Define meta data form SquadEmployee
+    Define meta data form Membership
     """
     class Meta:
         unique_together = (('employee', 'squad'))

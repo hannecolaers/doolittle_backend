@@ -1,6 +1,6 @@
 from rest_framework import generics
-from squads.models import Squad, SquadEmployee
-from squads.serializers import SquadSerializer, SquadEmployeeSerializer, EmployeesInSquadSerializer
+from squads.models import Squad, Membership
+from squads.serializers import SquadSerializer, MembershipSerializer, EmployeesInSquadSerializer
 from rest_framework import permissions
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route
@@ -19,13 +19,13 @@ class SquadViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['get'])
     def employees(self, request, pk=None):
         squad_id = self.kwargs.get('pk')
-        queryset = SquadEmployee.objects.filter(squad_id=squad_id)
+        queryset = Membership.objects.filter(squad_id=squad_id)
         serializer = EmployeesInSquadSerializer(queryset, context={'request': request}, many=True)
         return Response(serializer.data)
 
-class SquadEmployeeViewSet(viewsets.ModelViewSet):
+class MembershipViewSet(viewsets.ModelViewSet):
     """
     Provide an endpoint for POST, PUT, PATCH, DELETE and GET on /squadsemployees/ and /squadsemployees/<id>/
     """
-    queryset = SquadEmployee.objects.all()
-    serializer_class = SquadEmployeeSerializer
+    queryset = Membership.objects.all()
+    serializer_class = MembershipSerializer
