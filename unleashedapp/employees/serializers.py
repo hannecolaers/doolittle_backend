@@ -17,7 +17,6 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
 
     def create(self, validated_data):
         habitat_data = validated_data.pop('habitat')
-        employee = Employee.objects.create(**validated_data)
         if Habitat.objects.filter(name=habitat_data["name"]).exists():
             Habitat.objects.get(**habitat_data)
             habitat = Habitat.objects.get(name=habitat_data["name"])
@@ -25,6 +24,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
             return employee
         else:
             raise InvalidHabitatError()
+        employee = Employee.objects.create(**validated_data)
 
     def update(self, employee, validated_data):
         employee.first_name = validated_data.get('first_name', employee.first_name)
