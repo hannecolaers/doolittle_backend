@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from floorplan.models import Room, Space
+from rest_framework.validators import UniqueTogetherValidator
 
 
 class RoomSerializer(serializers.Serializer):
@@ -30,6 +31,12 @@ class SpaceSerializer(serializers.Serializer):
         model = Space
         fields = ('url', 'x', 'y', 'employee_id', 'room_id')
         unique_together = (("x", "y"),)
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Space.objects.all(),
+                fields=('x', 'y')
+            )
+        ]
 
     x = serializers.IntegerField(label='x')
     y = serializers.IntegerField(label='y')

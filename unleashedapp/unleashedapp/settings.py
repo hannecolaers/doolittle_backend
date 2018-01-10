@@ -80,7 +80,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'unleashed',
         'USER': 'root',
-        'PASSWORD':'MyNewPass'
+        'PASSWORD':'wachtwoordUnleashed'
     }
 }
 

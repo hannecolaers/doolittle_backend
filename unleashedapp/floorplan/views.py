@@ -13,7 +13,7 @@ class RoomViewSet(viewsets.ModelViewSet):
 
 class SpaceViewSet(viewsets.ModelViewSet):
     """
-    Provide an endpoint for POST, PUT, PATCH, DELETE and GET on /spaces/ and /spaces/<x,y>
+    Provide an endpoint for POST, PUT, PATCH, DELETE and GET on /spaces/ and /spaces/<id>
     """
     queryset = Space.objects.all()
     serializer_class = SpaceSerializer
