@@ -1,0 +1,17 @@
+# Main requirements for running the unleashed app api
+# Conventions:
+#  - Always pin requirements exactly (using ==). This prevents unexpected upgrades breaking the code
+#  - Always include dependencies of packages. We install with --no-deps to prevent version clashes between dependencies
+#  - Put an empty line and comment line above each requirement, with the dependencies directly underneath
+
+# The Django framework
+Django==2.0
+
+# Work with timezones
+pytz==2017.3
+
+#Mysql database support
+mysqlclient==1.3.12
+
+# Django addon to provide a REST framework
+djangorestframework==3.7.3
