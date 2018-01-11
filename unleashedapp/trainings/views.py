@@ -22,4 +22,4 @@ def training_list(request):
     """
     if request.method == 'GET':
         list_of_hashes = sheet.get_all_records()
-        return JsonResponse(list_of_hashes)
+        return JsonResponse(list_of_hashes, safe=False)
