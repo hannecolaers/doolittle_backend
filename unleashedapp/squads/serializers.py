@@ -27,12 +27,12 @@ class SquadSerializer(serializers.Serializer):
         return instance
 
 class MembershipSerializer(serializers.Serializer):
+    squad = SquadSerializer()
+    employee = EmployeeSerializer()
+
     class Meta:
         model = Membership
         fields = ('employee_id', 'squad_id')
-
-    squad = SquadSerializer()
-    employee = EmployeeSerializer()
 
     def create(self, validated_data):
         """
