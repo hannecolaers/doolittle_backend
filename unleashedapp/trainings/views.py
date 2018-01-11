@@ -32,21 +32,21 @@ def training_employee_list(request, lookup):
     if request.method == 'GET':
         cell_list = sheet.findall(lookup)
         data = []
-        # TODO: This should only look in name fields
         for cell in cell_list:
             row_value = sheet.range(cell.row, 1, cell.row, 11)
-            result_json = {
-                "date": row_value[0].value,
-                "days": row_value[1].value,
-                "firstname": row_value[2].value,
-                "lastname": row_value[3].value,
-                "team": row_value[4].value,
-                "training": row_value[5].value,
-                "company": row_value[6].value,
-                "city": row_value[7].value,
-                "cost": row_value[8].value,
-                "invoice": row_value[9].value,
-                "info": row_value[10].value,
-            }
-            data.append(result_json)
+            if row_value[2].value == lookup:
+                result_json = {
+                    "date": row_value[0].value,
+                    "days": row_value[1].value,
+                    "firstname": row_value[2].value,
+                    "lastname": row_value[3].value,
+                    "team": row_value[4].value,
+                    "training": row_value[5].value,
+                    "company": row_value[6].value,
+                    "city": row_value[7].value,
+                    "cost": row_value[8].value,
+                    "invoice": row_value[9].value,
+                    "info": row_value[10].value,
+                }
+                data.append(result_json)
         return JsonResponse(data, safe=False)
