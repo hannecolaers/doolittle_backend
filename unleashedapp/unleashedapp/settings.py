@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'squads',
     'habitats',
-    'employees'
+    'employees',
+    'training'
 ]
 
 REST_FRAMEWORK = {
