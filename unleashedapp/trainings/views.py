@@ -23,3 +23,12 @@ def training_list(request):
     if request.method == 'GET':
         list_of_hashes = sheet.get_all_records()
         return JsonResponse(list_of_hashes, safe=False)
+
+@csrf_exempt
+def training_employee_list(request, lookup):
+    """"
+    List all training
+    """
+    if request.method == 'GET':
+        list_of_hashes = sheet.findall(lookup)
+        return JsonResponse(list_of_hashes, safe=False)
