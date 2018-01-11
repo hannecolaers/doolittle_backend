@@ -23,10 +23,37 @@ def training_list(request):
         list_of_hashes = sheet.get_all_records()
         return JsonResponse(list_of_hashes, safe=False)
 
+
+@csrf_exempt
+def training_id(request, id):
+    """"
+    Get a single training
+    """
+    if request.method == 'GET':
+        data = []
+        row_value = sheet.range(id, 1, id, 11)
+        if row_value[0].value != "":
+            result_json = {
+                "date": row_value[0].value,
+                "days": row_value[1].value,
+                "firstname": row_value[2].value,
+                "lastname": row_value[3].value,
+                "team": row_value[4].value,
+                "training": row_value[5].value,
+                "company": row_value[6].value,
+                "city": row_value[7].value,
+                "cost": row_value[8].value,
+                "invoice": row_value[9].value,
+                "info": row_value[10].value,
+            }
+            data.append(result_json)
+        return JsonResponse(data, safe=False)
+
+
 @csrf_exempt
 def training_employee_list(request, firstname, lastname):
     """"
-    List all training
+    List all trainings from one person
     """
     if request.method == 'GET':
         cell_list = sheet.findall(firstname)
