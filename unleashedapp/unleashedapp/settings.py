@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'squads',
     'habitats',
     'employees',
-    'training'
+    'trainings'
 ]
 
 REST_FRAMEWORK = {
