@@ -32,7 +32,7 @@ class RoomTestCase(APITestCase):
 
     def test_room_serializer_id_field_content(self):
         """
-        The name field of a room should contain a value
+        The id field of a room should contain a value
         """
         self.room = Room.objects.create(name="TestRoom")
         serializer = create_room_serializer(self.room, '')
@@ -51,8 +51,8 @@ class RoomTestCase(APITestCase):
         The serializer should return [] when no objects are given
         """
         room = Room.objects.none()
-        serialzer = create_room_serializer(room, '/', many=True)
-        self.assertEqual(serialzer.data, [])
+        serializer = create_room_serializer(room, '/', many=True)
+        self.assertEqual(serializer.data, [])
 
     """
     Tests for the /rooms/{id} path
@@ -62,11 +62,12 @@ class RoomTestCase(APITestCase):
         """
         A GET request on /rooms/{id} should return a room
         """
-        response = self.client.post('/rooms/', {'name': 'NEW-ROOM-NAME'}, format='json')
-        self.assertEqual(response.data, {'id': 4, 'name': 'NEW-ROOM-NAME'})
-        response = self.client.get('/rooms/4/')
+        response = self.client.post('/rooms/', {'name': 'ROOM-NAME'}, format='json')
 
-        self.assertEqual(response.data, {'id': 4, 'name': 'NEW-ROOM-NAME'})
+        pk = Room.objects.get(name='ROOM-NAME').pk
+        self.assertEqual(response.data, {'id': pk, 'name': 'ROOM-NAME'})
+
+        response = self.client.get('/rooms/' + str(pk) + '/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_room_returns_404_when_not_found(self):
@@ -80,7 +81,7 @@ class RoomTestCase(APITestCase):
         """
         A POST request on /rooms/{id} should not be possible
         """
-        response = self.client.post('/rooms/7/', {'name': 'NEW-ROOM-NAME'}, format='json')
+        response = self.client.post('/rooms/666/', {'name': 'ROOM-NAME'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_put_room_returns_200_when_updated(self):
@@ -88,24 +89,25 @@ class RoomTestCase(APITestCase):
         A PUT request on /rooms/{id} should return an updated room
         """
         response = self.client.post('/rooms/', {'name': 'OLD-ROOM-NAME'}, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, {'id': 8, 'name': 'OLD-ROOM-NAME'})
 
-        response = self.client.put('/rooms/8/', {'name': 'NEW-ROOM-NAME'}, format='json')
+        pk = Room.objects.get(name='OLD-ROOM-NAME').pk
+        self.assertEqual(response.data, {'id': pk, 'name': 'OLD-ROOM-NAME'})
+
+        response = self.client.put('/rooms/' + str(pk) + '/', {'name': 'NEW-ROOM-NAME'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {'id': 8, 'name': 'NEW-ROOM-NAME'})
+        self.assertEqual(response.data, {'id': pk, 'name': 'NEW-ROOM-NAME'})
 
     def test_put_room_returns_400_when_incorrect(self):
         """
         A PUT request on /rooms/{id} should return 400 when sent incorrectly
         """
         response = self.client.post('/rooms/', {'name': 'OLD-ROOM-NAME'}, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, {'id': 9, 'name': 'OLD-ROOM-NAME'})
 
-        response = self.client.put('/rooms/9/', {'incorrectly-typed': 'NEW-ROOM-NAME'}, format='json')
+        pk = Room.objects.get(name='OLD-ROOM-NAME').pk
+        self.assertEqual(response.data, {'id': pk, 'name': 'OLD-ROOM-NAME'})
+
+        response = self.client.put('/rooms/' + str(pk) + '/', {'incorrectly-typed': 'NEW-ROOM-NAME'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data, {'name': ['This field is required.']})
 
     def test_put_room_returns_404_when_not_found(self):
         """
@@ -119,31 +121,35 @@ class RoomTestCase(APITestCase):
         A PATCH request on /rooms/{id} should return an updated room
         """
         response = self.client.post('/rooms/', {'name': 'OLD-ROOM-NAME'}, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, {'id': 5, 'name': 'OLD-ROOM-NAME'})
 
-        response = self.client.patch('/rooms/5/', {'name': 'NEW-ROOM-NAME'}, format='json')
+        pk = Room.objects.get(name='OLD-ROOM-NAME').pk
+        self.assertEqual(response.data, {'id': pk, 'name': 'OLD-ROOM-NAME'})
+
+        response = self.client.patch('/rooms/' + str(pk) + '/', {'name': 'NEW-ROOM-NAME'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {'id': 5, 'name': 'NEW-ROOM-NAME'})
+        self.assertEqual(response.data, {'id': pk, 'name': 'NEW-ROOM-NAME'})
 
     def test_patch_room_returns_400_when_incorrect(self):
         """
         A PATCH request on /rooms/{id} should return 400 when sent incorrectly
         """
         response = self.client.post('/rooms/', {'name': 'OLD-ROOM-NAME'}, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, {'id': 6, 'name': 'OLD-ROOM-NAME'})
 
-        response = self.client.patch('/rooms/6/', {'incorrectly-typed': 'DATA'}, format='json')
-        # TODO Send bad request
-        # self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        # self.assertEqual(response.data, {'name': ['This field is required.']})
+        pk = Room.objects.get(name='OLD-ROOM-NAME').pk
+        self.assertEqual(response.data, {'id': pk, 'name': 'OLD-ROOM-NAME'})
+
+        response = self.client.patch('/rooms/' + str(pk) + '/', {'name': None}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Incorrect patches return 200
+        response = self.client.patch('/rooms/' + str(pk) + '/', {'incorrectly-typed': 666}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_patch_room_returns_404_when_not_found(self):
         """
         A PATCH request on /rooms/{id} should return 404 when using an invalid id
         """
-        response = self.client.patch('/rooms/666/', {'name': 'NOT-SENDED'}, format='json')
+        response = self.client.patch('/rooms/666/', {'name': 'NOT-SEND'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_room_returns_204_when_deleting(self):
@@ -152,8 +158,11 @@ class RoomTestCase(APITestCase):
         """
         response = self.client.post('/rooms/', {'name': 'TO-BE-DELETED-ROOM'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, {'id': 1, 'name': 'TO-BE-DELETED-ROOM'})
-        response = self.client.delete('/rooms/1/')
+
+        pk = Room.objects.get(name='TO-BE-DELETED-ROOM').pk
+        self.assertEqual(response.data, {'id': pk, 'name': 'TO-BE-DELETED-ROOM'})
+
+        response = self.client.delete('/rooms/' + str(pk) + '/')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_delete_room_returns_404_when_not_found(self):
@@ -171,12 +180,13 @@ class RoomTestCase(APITestCase):
         """
         A GET request on /rooms/ should return an array of rooms
         """
-        response = self.client.post('/rooms/', {'name': 'kitchen'}, format='json')
-        response = self.client.post('/rooms/', {'name': 'lobby'}, format='json')
+        self.client.post('/rooms/', {'name': 'kitchen'}, format='json')
+        self.client.post('/rooms/', {'name': 'lobby'}, format='json')
         response = self.client.get('/rooms/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # TODO Test for array data
-        # self.assertIn(response.data, [{'id': 2, 'name': 'kitchen'}, {'id': 3, 'name': 'lobby'}])
+        self.assertEqual(Room.objects.count(), 2)
+        self.assertIsNotNone(Room.objects.get(name='kitchen'))
+        self.assertIsNotNone(Room.objects.get(name='lobby'))
 
     def test_get_all_rooms_returns_200_when_non_found(self):
         """
@@ -184,14 +194,15 @@ class RoomTestCase(APITestCase):
         """
         response = self.client.get('/rooms/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # TODO Test for empty array
-        # self.assertEqual(response.data, [])
+        self.assertEqual(Room.objects.count(), 0)
 
     def test_post_all_rooms_returns_201_when_correct_format(self):
         """
         A POST request on /rooms/ should create a new room
         """
         data = {'name': 'NEW-ROOM-NAME'}
+        self.assertEqual(Room.objects.count(), 0)
+
         response = self.client.post('/rooms/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Room.objects.count(), 1)
@@ -203,7 +214,6 @@ class RoomTestCase(APITestCase):
         """
         response = self.client.post('/rooms/', {'incorrectly-typed': 'NEW-ROOM-NAME'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data, {'name': ['This field is required.']})
 
     def test_put_all_rooms_returns_405(self):
         """
@@ -227,7 +237,6 @@ class RoomTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-# TODO fix creating of second serializer in class
 def create_space_serializer(data, url, many=False):
     request = APIRequestFactory().get(url)
     serializer = SpaceSerializer(data, many=many, context={'request': request})
@@ -298,10 +307,12 @@ class SpaceTestCase(APITestCase):
         """
         A GET request on /spaces/{id} should return a space
         """
-        response = self.client.post('/spaces/', {'x': 100, 'y': 200, 'employee_id': 1, 'room_id': 2}, format='json')
-        self.assertEqual(response.data, {'x': 100, 'y': 200, 'employee_id': 1, 'room_id': 2})
-        response = self.client.get('/spaces/1/')
+        self.client.post('/spaces/', {'x': 100, 'y': 200, 'employee_id': 1, 'room_id': 2}, format='json')
 
+        pk = Space.objects.get(x=100, y=200, employee_id=1, room_id=2).pk
+        self.assertEqual(pk, 4)
+
+        response = self.client.get('/spaces/' + str(pk) + '/')
         self.assertEqual(response.data, {'x': 100, 'y': 200, 'employee_id': 1, 'room_id': 2})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -323,11 +334,13 @@ class SpaceTestCase(APITestCase):
         """
         A PUT request on /spaces/{id} should return an updated space
         """
-        response = self.client.post('/spaces/', {'x': 100, 'y': 200, 'employee_id': 1, 'room_id': 2}, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, {'x': 100, 'y': 200, 'employee_id': 1, 'room_id': 2})
+        self.client.post('/spaces/', {'x': 100, 'y': 200, 'employee_id': 1, 'room_id': 2}, format='json')
 
-        response = self.client.put('/spaces/2/', {'x': 300, 'y': 400, 'employee_id': 3, 'room_id': 4}, format='json')
+        pk = Space.objects.get(x=100, y=200, employee_id=1, room_id=2).pk
+        self.assertEqual(pk, 8)
+
+        response = self.client.put('/spaces/' + str(pk) + '/', {'x': 300, 'y': 400, 'employee_id': 3, 'room_id': 4},
+                                   format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {'x': 300, 'y': 400, 'employee_id': 3, 'room_id': 4})
 
@@ -335,60 +348,72 @@ class SpaceTestCase(APITestCase):
         """
         A PUT request on /spaces/{id} should return 400 when sent incorrectly
         """
-        response = self.client.post('/spaces/', {'x': 100, 'y': 200, 'employee_id': 1, 'room_id': 2}, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, {'x': 100, 'y': 200, 'employee_id': 1, 'room_id': 2})
+        self.client.post('/spaces/', {'x': 100, 'y': 200, 'employee_id': 1, 'room_id': 2}, format='json')
 
-        response = self.client.put('/spaces/3/', {'incorrectly-typed': 666}, format='json')
+        pk = Space.objects.get(x=100, y=200, employee_id=1, room_id=2).pk
+        self.assertEqual(pk, 9)
+
+        response = self.client.put('/spaces/' + str(pk) + '/', {'incorrectly-typed': 666}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_put_space_returns_404_when_not_found(self):
         """
-        A PUT request on /spaces/{id} should return a 404 when using an invalid x,y
+        A PUT request on /spaces/{id} should return a 404 when using an invalid id
         """
-        response = self.client.put('/spaces/666/', {'x': 100, 'y': 200, 'employee_id': 1, 'room_id': 2}, format='json')
+        response = self.client.put('/spaces/666/', {'x': 300, 'y': 400, 'employee_id': 3, 'room_id': 4}, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_patch_space_returns_200_when_updated(self):
         """
         A PATCH request on /spaces/{id} should return an updated space
         """
-        response = self.client.post('/spaces/', {'x': 10, 'y': 20, 'employee_id': 1, 'room_id': 2}, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, {'x': 10, 'y': 20, 'employee_id': 1, 'room_id': 2})
+        self.client.post('/spaces/', {'x': 100, 'y': 200, 'employee_id': 1, 'room_id': 2}, format='json')
 
-        response = self.client.patch('/spaces/1/', {'x': 10, 'y': 20, 'employee_id': 3, 'room_id': 4}, format='json')
+        pk = Space.objects.get(x=100, y=200, employee_id=1, room_id=2).pk
+        self.assertEqual(pk, 5)
+
+        response = self.client.patch('/spaces/' + str(pk) + '/', {'x': 100, 'y': 200, 'employee_id': 3, 'room_id': 4},
+                                     format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {'x': 10, 'y': 20, 'employee_id': 3, 'room_id': 4})
+        self.assertEqual(response.data, {'x': 100, 'y': 200, 'employee_id': 3, 'room_id': 4})
 
     def test_patch_space_returns_400_when_incorrect(self):
         """
         A PATCH request on /spaces/{id} should return 400 when sent incorrectly
         """
-        response = self.client.post('/spaces/', {'employee_id': 1, 'room_id': 2}, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, {'x': 11, 'y': 21, 'employee_id': 1, 'room_id': 2})
+        self.client.post('/spaces/', {'x': 100, 'y': 200, 'employee_id': 1, 'room_id': 2}, format='json')
 
-        response = self.client.patch('/spaces/11,21/', {'incorrectly-typed': 666}, format='json')
-        # TODO Send bad request
-        # self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        # self.assertEqual(response.data, {'name': ['This field is required.']})
+        pk = Space.objects.get(x=100, y=200, employee_id=1, room_id=2).pk
+        self.assertEqual(pk, 6)
+
+        response = self.client.patch('/spaces/' + str(pk) + '/', {'employee_id': 'invalid-text'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Incorrect patches return 200
+        response = self.client.patch('/spaces/' + str(pk) + '/', {'incorrectly-typed': 666}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_patch_space_returns_404_when_not_found(self):
         """
-        A PATCH request on /spaces/<x,y> should return 404 when using an invalid x,y
+        A PATCH request on /spaces/{id} should return 404 when using an invalid id
         """
-        response = self.client.patch('/spaces/666,999/', {'employee_id': 666, 'room_id': 666}, format='json')
+        response = self.client.patch('/spaces/666/', {'x': 100, 'y': 200, 'employee_id': 1, 'room_id': 2},
+                                     format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_space_returns_204_when_deleting(self):
         """
         A DELETE request on /spaces/{id} should delete a space
         """
-        response = self.client.post('/spaces/10', {'x': 30, 'y': 40, 'employee_id': 12, 'room_id': 22}, format='json')
+        response = self.client.post('/spaces/', {'x': 100, 'y': 200, 'employee_id': 1, 'room_id': 2}, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, {'x': 30, 'y': 40, 'employee_id': 12, 'room_id': 22})
-        response = self.client.delete('/spaces/10')
+        self.assertEqual(Space.objects.count(), 1)
+
+        pk = Space.objects.get(x=100, y=200, employee_id=1, room_id=2).pk
+        self.assertEqual(pk, 1)
+
+        response = self.client.delete('/spaces/' + str(pk) + '/')
+        self.assertEqual(Space.objects.count(), 0)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_delete_space_returns_404_when_not_found(self):
@@ -406,12 +431,13 @@ class SpaceTestCase(APITestCase):
         """
         A GET request on /spaces/ should return an array of spaces
         """
-        response = self.client.post('/spaces/', {'employee_id': 13, 'room_id': 23}, format='json')
-        response = self.client.post('/spaces/', {'employee_id': 14, 'room_id': 24}, format='json')
+        self.client.post('/spaces/', {'x': 100, 'y': 200, 'employee_id': 1, 'room_id': 2}, format='json')
+        self.client.post('/spaces/', {'x': 300, 'y': 400, 'employee_id': 3, 'room_id': 4}, format='json')
         response = self.client.get('/spaces/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # TODO Test for array data
-        # self.assertIn(response.data, [{'id': 2, 'name': 'kitchen'}, {'id': 3, 'name': 'lobby'}])
+        self.assertEqual(Space.objects.count(), 2)
+        self.assertIsNotNone(Space.objects.get(x=100, y=200, employee_id=1, room_id=2))
+        self.assertIsNotNone(Space.objects.get(x=300, y=400, employee_id=3, room_id=4))
 
     def test_get_all_spaces_returns_200_when_non_found(self):
         """
@@ -419,27 +445,30 @@ class SpaceTestCase(APITestCase):
         """
         response = self.client.get('/spaces/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # TODO Test for empty array
-        # self.assertEqual(response.data, [])
+        self.assertEqual(Space.objects.count(), 0)
 
     def test_post_all_spaces_returns_201_when_correct_format(self):
         """
         A POST request on /spaces/ should create a new space
         """
-        data = {'employee_id': 15, 'room_id': 25}
+        data = {'x': 100, 'y': 200, 'employee_id': 1, 'room_id': 2}
+        self.assertEqual(Space.objects.count(), 0)
         response = self.client.post('/spaces/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Space.objects.count(), 1)
-        self.assertEqual(Space.objects.get().employee_id, 15)
-        self.assertEqual(Space.objects.get().employee_id, 25)
+        self.assertEqual(Space.objects.get().x, 100)
+        self.assertEqual(Space.objects.get().y, 200)
+        self.assertEqual(Space.objects.get().employee_id, 1)
+        self.assertEqual(Space.objects.get().room_id, 2)
 
     def test_post_all_spaces_returns_400_when_bad_format(self):
         """
         A POST request on /spaces/ using the wrong format should return a 400 error
         """
+        self.assertEqual(Space.objects.count(), 0)
         response = self.client.post('/spaces/', {'incorrectly-typed': 666}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data, {'employee_id': ['This field is required.']})
+        self.assertEqual(Space.objects.count(), 0)
 
     def test_put_all_spaces_returns_405(self):
         """
