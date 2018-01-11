@@ -6,5 +6,5 @@ from trainings import views
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     url(r'^trainings/$', views.training_list),
-    url(r'^trainings/(?P<lookup>\w+)/$', views.training_employee_list),
+    url(r'^trainings/(?P<firstname>\w+)/(?P<lastname>\w+)/$', views.training_employee_list),
 ]

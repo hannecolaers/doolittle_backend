@@ -25,16 +25,16 @@ def training_list(request):
         return JsonResponse(list_of_hashes, safe=False)
 
 @csrf_exempt
-def training_employee_list(request, lookup):
+def training_employee_list(request, firstname, lastname):
     """"
     List all training
     """
     if request.method == 'GET':
-        cell_list = sheet.findall(lookup)
+        cell_list = sheet.findall(firstname)
         data = []
         for cell in cell_list:
             row_value = sheet.range(cell.row, 1, cell.row, 11)
-            if row_value[2].value == lookup:
+            if row_value[2].value == firstname and row_value[3].value == lastname:
                 result_json = {
                     "date": row_value[0].value,
                     "days": row_value[1].value,
