@@ -5,7 +5,6 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-from training.serializers import TrainingSerializer
 
 # Authenticate with Google
 scope = ['https://spreadsheets.google.com/feeds']
@@ -16,13 +15,11 @@ client = gspread.authorize(creds)
 # Get the Training spreadsheet file
 sheet = client.open_by_key('1jEZR1uaEylQ05AohVvRpdQSWGOl7nDQE4oDtTWVAGkw').sheet1
 
-
 @csrf_exempt
 def training_list(request):
     """"
-    List all requests
+    List all training
     """
     if request.method == 'GET':
         list_of_hashes = sheet.get_all_records()
-        training_serialized = TrainingSerializer('json', list_of_hashes)
-        return JsonResponse(training_serialized)
+        return JsonResponse(list_of_hashes)
