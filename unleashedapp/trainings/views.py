@@ -30,5 +30,20 @@ def training_employee_list(request, lookup):
     List all training
     """
     if request.method == 'GET':
-        list_of_hashes = sheet.findall(lookup)
-        return JsonResponse(list_of_hashes, safe=False)
+        cell_list = sheet.find(lookup)
+        #for cell in cell_list
+        row_value = sheet.range(cell_list.row, 1, cell_list.row, 11)
+        result_json = [ {
+            "Date of the event": row_value[0].value,
+            "Days": row_value[1].value,
+            "Name": row_value[2].value,
+            "Last Name": row_value[3].value,
+            "Team": row_value[4].value,
+            "Training / Event / Hotel": row_value[5].value,
+            "Company": row_value[6].value,
+            "City": row_value[7].value,
+            "Cost / Euro": row_value[8].value,
+            "Invoice to finance?": row_value[9].value,
+            "Extra info": row_value[10].value,
+        } ]
+        return JsonResponse(result_json, safe=False)
