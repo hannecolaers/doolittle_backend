@@ -30,20 +30,23 @@ def training_employee_list(request, lookup):
     List all training
     """
     if request.method == 'GET':
-        cell_list = sheet.find(lookup)
-        #for cell in cell_list
-        row_value = sheet.range(cell_list.row, 1, cell_list.row, 11)
-        result_json = [ {
-            "Date of the event": row_value[0].value,
-            "Days": row_value[1].value,
-            "Name": row_value[2].value,
-            "Last Name": row_value[3].value,
-            "Team": row_value[4].value,
-            "Training / Event / Hotel": row_value[5].value,
-            "Company": row_value[6].value,
-            "City": row_value[7].value,
-            "Cost / Euro": row_value[8].value,
-            "Invoice to finance?": row_value[9].value,
-            "Extra info": row_value[10].value,
-        } ]
-        return JsonResponse(result_json, safe=False)
+        cell_list = sheet.findall(lookup)
+        data = []
+        # TODO: This should only look in name fields
+        for cell in cell_list:
+            row_value = sheet.range(cell.row, 1, cell.row, 11)
+            result_json = {
+                "date": row_value[0].value,
+                "days": row_value[1].value,
+                "firstname": row_value[2].value,
+                "lastname": row_value[3].value,
+                "team": row_value[4].value,
+                "training": row_value[5].value,
+                "company": row_value[6].value,
+                "city": row_value[7].value,
+                "cost": row_value[8].value,
+                "invoice": row_value[9].value,
+                "info": row_value[10].value,
+            }
+            data.append(result_json)
+        return JsonResponse(data, safe=False)
