@@ -377,21 +377,17 @@ class SpaceTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {'x': 100, 'y': 200, 'employee_id': 3, 'room_id': 4})
 
-    def test_patch_space_returns_400_when_incorrect(self):
+    def test_put_space_returns_400_when_incorrect(self):
         """
-        A PATCH request on /spaces/{id} should return 400 when sent incorrectly
+        A PUT request on /spaces/{id} should return 400 when sent incorrectly
         """
         self.client.post('/spaces/', {'x': 100, 'y': 200, 'employee_id': 1, 'room_id': 2}, format='json')
 
         pk = Space.objects.get(x=100, y=200, employee_id=1, room_id=2).pk
-        self.assertEqual(pk, 6)
+        self.assertEqual(pk, 9)
 
-        response = self.client.patch('/spaces/' + str(pk) + '/', {'employee_id': 'invalid-text'}, format='json')
+        response = self.client.put('/spaces/' + str(pk) + '/', {'incorrectly-typed': 666}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-        # Incorrect patches return 200
-        response = self.client.patch('/spaces/' + str(pk) + '/', {'incorrectly-typed': 666}, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_patch_space_returns_404_when_not_found(self):
         """

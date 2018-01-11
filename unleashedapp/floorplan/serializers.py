@@ -1,35 +1,29 @@
-from rest_framework import serializers
+from rest_framework import serializers, status
 from floorplan.models import Room, Space
 from rest_framework.validators import UniqueTogetherValidator
+from rest_framework.exceptions import APIException
 
 
-class RoomSerializer(serializers.Serializer):
+class RoomSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Room
-        fields = ('url', 'id', 'name')
-
-    id = serializers.IntegerField(read_only=True)
-    name = serializers.CharField(style={'base_template': 'textarea.html'})
+        fields = ('id', 'name')
 
     def create(self, validated_data):
-        """
-        Create and return a new `Room` instance, given the validated data.
-        """
         return Room.objects.create(**validated_data)
 
-    def update(self, instance, validated_data):
-        """
-        Update and return an existing `Room` instance, given the validated data.
-        """
-        instance.name = validated_data.get('name', instance.name)
-        instance.save()
-        return instance
+    def update(self, room, validated_data):
+        room.name = validated_data.get('name', room.name)
+        room.save()
+        return room
 
 
-class SpaceSerializer(serializers.Serializer):
+class SpaceSerializer(serializers.HyperlinkedModelSerializer):
+    room = RoomSerializer()
+
     class Meta:
         model = Space
-        fields = ('url', 'x', 'y', 'employee_id', 'room_id')
+        fields = ('x', 'y', 'employee_id', 'room')
         unique_together = (("x", "y"),)
         validators = [
             UniqueTogetherValidator(
@@ -38,24 +32,29 @@ class SpaceSerializer(serializers.Serializer):
             )
         ]
 
-    x = serializers.IntegerField(label='x')
-    y = serializers.IntegerField(label='y')
-    employee_id = serializers.IntegerField(label='employee_id')
-    room_id = serializers.IntegerField(label='room_id')
-
     def create(self, validated_data):
-        """
-        Create and return a new `Space` instance, given the validated data.
-        """
-        return Space.objects.create(**validated_data)
+        room_data = validated_data.pop('room')
+        if Room.objects.filter(name=room_data["name"]).exists():
+            Room.objects.get(**room_data)
+            room = Room.objects.get(name=room_data["name"])
+            space = Space.objects.create(**validated_data)
+            space.room = room
+            return space
+        else:
+            raise InvalidRoomError()
 
-    def update(self, instance, validated_data):
-        """
-        Update and return an existing `Space` instance, given the validated data.
-        """
-        instance.x = validated_data.get('x', instance.x)
-        instance.y = validated_data.get('y', instance.y)
-        instance.employee_id = validated_data.get('employee_id', instance.employee_id)
-        instance.room_id = validated_data.get('room_id', instance.room_id)
-        instance.save()
-        return instance
+    def update(self, space, validated_data):
+        space.x = validated_data.get('x', space.x)
+        space.y = validated_data.get('y', space.y)
+        space.employee_id = validated_data.get('employee_id', space.employee_id)
+        if validated_data.get('room'):
+            room_id = validated_data.get('room').get('id')
+            room = Room.objects.get(id=room_id)
+            space.room = room
+            space.save()
+        return space
+
+
+class InvalidRoomError(APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = "Room does not exist"
