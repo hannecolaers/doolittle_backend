@@ -6,7 +6,7 @@
 To execute in a command prompt to setup the virtual environment ```virtualenv``` in the root of the project.
 
 ```
-pip install virtual env
+pip install virtualenv
 virtualenv env
 ```
 
