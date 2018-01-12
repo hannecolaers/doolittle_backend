@@ -20,9 +20,8 @@ class SquadTestCase(TestCase):
         self.gclient = gspread.authorize(creds)
         # Create a new, empty spreadsheet and worksheet
         self.sh = self.gclient.open_by_key('1jEZR1uaEylQ05AohVvRpdQSWGOl7nDQE4oDtTWVAGkw')
-        self.ws = self.sh.worksheet("TestSheet")
-        # Add the heading rows
-        # self.ws.insert_row(["date", "days", "firstname", "lastname", "team", "training", "company", "city", "cost", "invoice", "info"])
+        self.ws = self.sh.worksheet('TestSheet')
+        self.ws.resize(rows=1, cols=11)
         self.training_json = [
             {
                 "date": "1/1/2018",
@@ -46,7 +45,7 @@ class SquadTestCase(TestCase):
         """
         A GET request on /trainings/ should return an array of trainings
         """
-        self.ws.insert_row(["1/1/2018",1,"Yannick","Franssen","Unleashed","Django","PXL","Hasselt",1.8,"Yep","Nope"], 2)
+        self.ws.append_row(["1/1/2018",1,"Yannick","Franssen","Unleashed","Django","PXL","Hasselt",1.8,"Yep","Nope"])
         response = self.client.get('/trainings/?sheet=TestSheet')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
