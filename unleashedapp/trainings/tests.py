@@ -55,3 +55,32 @@ class SquadTestCase(TestCase):
         """
         response = self.client.get('/trainings/?sheet=TestSheet')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_post_all_training_returns_400_when_bad_format(self):
+        """
+        A POST request on /trainings/ using the wrong format should return a 400 error
+        """
+        data = {'title': 'Newtraining'}
+        response = self.client.post('/trainings/?sheet=TestSheet', data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_put_all_training_returns_405(self):
+        """
+        A PUT request on /trainings/ should not be possible
+        """
+        response = self.client.put('/trainings/?sheet=TestSheet')
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_patch_all_training_returns_405(self):
+        """
+        A PATCH request on /trainings/ should not be possible
+        """
+        response = self.client.patch('/trainings/?sheet=TestSheet')
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_delete_all_training_returns_405(self):
+        """
+        A DELETE request on /trainings/ should not be possible
+        """
+        response = self.client.delete('/trainings/?sheet=TestSheet')
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)

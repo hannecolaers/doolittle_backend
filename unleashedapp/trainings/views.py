@@ -28,6 +28,15 @@ def training_list(request):
             return JsonResponse([], safe=False, status=status.HTTP_200_OK)
         else:
             return JsonResponse(list_of_records, safe=False, status=status.HTTP_200_OK)
+    elif request.method == 'POST':
+        return JsonResponse([], safe=False, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == 'PUT':
+        return JsonResponse([], safe=False, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    elif request.method == 'PATCH':
+        return JsonResponse([], safe=False, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    elif request.method == 'DELETE':
+        return JsonResponse([], safe=False, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
 
 @csrf_exempt
