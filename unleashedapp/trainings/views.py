@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
+from rest_framework import status
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
@@ -22,8 +23,11 @@ def training_list(request):
     sheet = request.GET.get('sheet', 'Data')
     worksheet = spreadsheet.worksheet(sheet)
     if request.method == 'GET':
-        list_of_hashes = worksheet.get_all_records()
-        return JsonResponse(list_of_hashes, safe=False)
+        list_of_records = worksheet.get_all_records()
+        if list_of_records == "":
+            return JsonResponse([], safe=False, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse(list_of_records, safe=False, status=status.HTTP_200_OK)
 
 
 @csrf_exempt
