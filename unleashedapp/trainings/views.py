@@ -12,15 +12,17 @@ creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', s
 client = gspread.authorize(creds)
 
 # Get the Training spreadsheet file
-sheet = client.open_by_key('1jEZR1uaEylQ05AohVvRpdQSWGOl7nDQE4oDtTWVAGkw').sheet1
+spreadsheet = client.open_by_key('1jEZR1uaEylQ05AohVvRpdQSWGOl7nDQE4oDtTWVAGkw')
 
 @csrf_exempt
 def training_list(request):
     """"
     List all training
     """
+    sheet = request.GET.get('sheet', 'Data')
+    worksheet = spreadsheet.worksheet(sheet)
     if request.method == 'GET':
-        list_of_hashes = sheet.get_all_records()
+        list_of_hashes = worksheet.get_all_records()
         return JsonResponse(list_of_hashes, safe=False)
 
 
@@ -29,9 +31,11 @@ def training_id(request, id):
     """"
     Get a single training
     """
+    sheet = request.GET.get('sheet', 'Data')
+    worksheet = spreadsheet.worksheet(sheet)
     if request.method == 'GET':
         data = []
-        row_value = sheet.range(id, 1, id, 11)
+        row_value = worksheet.range(id, 1, id, 11)
         if row_value[0].value != "":
             result_json = {
                 "date": row_value[0].value,
@@ -55,11 +59,13 @@ def training_employee_list(request, firstname, lastname):
     """"
     List all trainings from one person
     """
+    sheet = request.GET.get('sheet', 'Data')
+    worksheet = spreadsheet.worksheet(sheet)
     if request.method == 'GET':
-        cell_list = sheet.findall(firstname)
+        cell_list = worksheet.findall(firstname)
         data = []
         for cell in cell_list:
-            row_value = sheet.range(cell.row, 1, cell.row, 11)
+            row_value = worksheet.range(cell.row, 1, cell.row, 11)
             if row_value[2].value == firstname and row_value[3].value == lastname:
                 result_json = {
                     "date": row_value[0].value,
