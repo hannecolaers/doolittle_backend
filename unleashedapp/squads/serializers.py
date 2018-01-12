@@ -4,10 +4,10 @@ from employees.models import Employee
 from employees.serializers import EmployeeSerializer
 from rest_framework.exceptions import APIException
 
-class SquadSerializer(serializers.Serializer):
+class SquadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Squad
-        fields = ('name')
+        fields = ('id', 'name')
 
     id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(style={'base_template': 'textarea.html'})
@@ -26,13 +26,13 @@ class SquadSerializer(serializers.Serializer):
         instance.save()
         return instance
 
-class MembershipSerializer(serializers.Serializer):
+class MembershipSerializer(serializers.ModelSerializer):
     squad = SquadSerializer()
     employee = EmployeeSerializer()
 
     class Meta:
         model = Membership
-        fields = ('employee_id', 'squad_id')
+        fields = ('employee', 'squad')
 
     def create(self, validated_data):
         """
@@ -52,7 +52,7 @@ class MembershipSerializer(serializers.Serializer):
 class EmployeesInSquadSerializer(serializers.Serializer):
     class Meta:
         model = Membership
-        fields = ('employee_id')
+        fields = ('employee_id',)
 
     employee = EmployeeSerializer()
 
