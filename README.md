@@ -63,3 +63,24 @@ html report:
 ```
 coverage html
 ```
+
+## Installation django-rest-framework-social-oauth2
+pip install django-rest-framework-social-oauth2
+
+Package for the authentication with google oatuh2.
+The code for the support of Django 2 is available in github, but there is no release yet with this update. So for now you have to make these change in the package in your virtual enviornment folder:
+Lib/site-packages/rest_framework_social_oauth2 
+
+3 files need changes:
+* authentication.py
+* backends.py
+* oauth2_grants.py
+```
+replace this line: 
+from django.core.urlresolvers import reverse
+with:
+try:
+    from django.urls import reverse
+ except ImportError:  # Will be removed in Django 2.0
+    from django.core.urlresolvers import reverse
+```
