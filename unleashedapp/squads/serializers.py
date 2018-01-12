@@ -1,16 +1,11 @@
-from rest_framework import serializers, status
+from rest_framework import serializers
 from squads.models import Squad, Membership
-from employees.models import Employee
 from employees.serializers import EmployeeSerializer
-from rest_framework.exceptions import APIException
 
-class SquadSerializer(serializers.ModelSerializer):
+class SquadSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Squad
         fields = ('id', 'name')
-
-    id = serializers.IntegerField(read_only=True)
-    name = serializers.CharField(style={'base_template': 'textarea.html'})
 
     def create(self, validated_data):
         """
@@ -26,7 +21,7 @@ class SquadSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-class MembershipSerializer(serializers.ModelSerializer):
+class MembershipSerializer(serializers.HyperlinkedModelSerializer):
     squad = SquadSerializer()
     employee = EmployeeSerializer()
 
@@ -49,7 +44,7 @@ class MembershipSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-class EmployeesInSquadSerializer(serializers.Serializer):
+class EmployeesInSquadSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Membership
         fields = ('employee_id',)

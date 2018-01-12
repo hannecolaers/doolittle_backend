@@ -5,7 +5,7 @@ from employees.models import Employee
 Model class for Squad
 """
 class Squad(models.Model):
-    name = models.TextField(max_length=40)
+    name = models.CharField(max_length=40)
 
 """
 Model class for Membership
