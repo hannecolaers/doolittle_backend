@@ -22,21 +22,20 @@ class SquadTestCase(TestCase):
         self.sh = self.gclient.open_by_key('1jEZR1uaEylQ05AohVvRpdQSWGOl7nDQE4oDtTWVAGkw')
         self.ws = self.sh.worksheet('TestSheet')
         self.ws.resize(rows=1, cols=11)
-        self.training_json = [
-            {
-                "date": "1/1/2018",
-                "days": 1,
-                "firstname": "Yannick",
-                "lastname": "Franssen",
-                "team": "Unleashed",
-                "training": "Django",
-                "company": "PXL",
-                "city": "Hasselt",
-                "cost": 1.8,
-                "invoice": "Yep",
-                "info": "Nope"
-            }
-        ]
+        self.training_json_body = {
+            "date": "1/1/2018",
+            "days": 1,
+            "firstname": "Yannick",
+            "lastname": "Franssen",
+            "team": "Unleashed",
+            "training": "Django",
+            "company": "PXL",
+            "city": "Hasselt",
+            "cost": 1.8,
+            "invoice": "Yep",
+            "info": "Nope"
+        }
+        self.training_json = [ self.training_json_body ]
 
     """
     Tests for the /trainings/ path
@@ -56,13 +55,20 @@ class SquadTestCase(TestCase):
         response = self.client.get('/trainings/?sheet=TestSheet')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_post_all_training_returns_400_when_bad_format(self):
+    def test_post_all_training_returns_201_when_correct_format(self):
         """
-        A POST request on /trainings/ using the wrong format should return a 400 error
+        A POST request on /trainings/ should create a new training
         """
-        data = {'title': 'Newtraining'}
-        response = self.client.post('/trainings/?sheet=TestSheet', data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        response = self.client.post('/trainings/', self.training_json_body, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    # def test_post_all_training_returns_400_when_bad_format(self):
+    #     """
+    #     A POST request on /trainings/ using the wrong format should return a 400 error
+    #     """
+    #     data = {'title': 'Newtraining'}
+    #     response = self.client.post('/trainings/?sheet=TestSheet', data, format="json")
+    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_put_all_training_returns_405(self):
         """

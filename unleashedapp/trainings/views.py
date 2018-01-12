@@ -5,12 +5,16 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework import status
 import gspread
+import logging
+import json
 from oauth2client.service_account import ServiceAccountCredentials
 
 # Authenticate with Google
 scope = ['https://spreadsheets.google.com/feeds']
 creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
 client = gspread.authorize(creds)
+
+logger = logging.getLogger(__name__)
 
 # Get the Training spreadsheet file
 spreadsheet = client.open_by_key('1jEZR1uaEylQ05AohVvRpdQSWGOl7nDQE4oDtTWVAGkw')
@@ -29,14 +33,19 @@ def training_list(request):
         else:
             return JsonResponse(list_of_records, safe=False, status=status.HTTP_200_OK)
     elif request.method == 'POST':
-        return JsonResponse([], safe=False, status=status.HTTP_400_BAD_REQUEST)
+        logger.error(request.body)
+        received_json_data = json.loads(request.body)
+        logger.error(received_json_data)
+        if received_json_data != "" and received_json_data['date'] != "" and received_json_data['days'] != "":
+            return JsonResponse(received_json_data, safe=False, status=status.HTTP_201_CREATED)
+        else:
+            return JsonResponse([], safe=False, status=status.HTTP_400_BAD_REQUEST)
     elif request.method == 'PUT':
         return JsonResponse([], safe=False, status=status.HTTP_405_METHOD_NOT_ALLOWED)
     elif request.method == 'PATCH':
         return JsonResponse([], safe=False, status=status.HTTP_405_METHOD_NOT_ALLOWED)
     elif request.method == 'DELETE':
         return JsonResponse([], safe=False, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
 
 
 @csrf_exempt
