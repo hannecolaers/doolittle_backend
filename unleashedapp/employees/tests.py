@@ -1,10 +1,10 @@
-from django.test import TestCase, Client, RequestFactory
+from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from django.utils.datetime_safe import datetime
 from rest_framework import status
 import datetime
-
-from rest_framework.test import APIClient, APIRequestFactory
+from django.contrib.auth.models import User
+from rest_framework.test import APIClient
 
 from employees.models import Employee
 from employees.serializers import EmployeeSerializer
@@ -43,6 +43,8 @@ class EmployeeTest(TestCase):
         }
         self.url_with_id = reverse('employee-detail', args=[self.employee.id])
         self.url_absolute_with_id = 'http://testserver/employees/' + str(self.employee.id) + '/'
+        user = User.objects.create(username='test')
+        self.client.force_authenticate(user=user)
 
     """ 
         Test serializer 
