@@ -7,7 +7,6 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient, APIRequestFactory
-import logging
 import datetime
 
 import gspread
@@ -22,6 +21,8 @@ class SquadTestCase(TestCase):
         # Create a new, empty spreadsheet and worksheet
         self.sh = self.gclient.open_by_key('1jEZR1uaEylQ05AohVvRpdQSWGOl7nDQE4oDtTWVAGkw')
         self.ws = self.sh.worksheet("TestSheet")
+        # Add the heading rows
+        # self.ws.insert_row(["date", "days", "firstname", "lastname", "team", "training", "company", "city", "cost", "invoice", "info"])
         self.training_json = [
             {
                 "date": "1/1/2018",
