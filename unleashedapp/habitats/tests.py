@@ -1,19 +1,24 @@
 from django.urls import reverse
-from django.test import TestCase, Client, RequestFactory
+from django.test import TestCase
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient, APIRequestFactory
+from rest_framework.test import APIClient, APIRequestFactory
 
 from habitats.models import Habitat
 from habitats.serializers import HabitatSerializer
+from django.contrib.auth.models import User
+
 
 def create_serializer(data, url, many = False):
     request = APIRequestFactory().get(url)
-    serializer = HabitatSerializer(data, many = many, context = {'request': request})
+    serializer = HabitatSerializer(data, many=many, context={'request': request})
     return serializer
+
 
 class HabitatTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        user = User.objects.create(username='test')
+        self.client.force_authenticate(user=user)
         self.habitat = Habitat.objects.create(
             name="TestHabitat"
         )
@@ -22,6 +27,7 @@ class HabitatTestCase(TestCase):
         }
         self.url_with_id = reverse('habitat-detail', args=[self.habitat.id])
         self.url_absolute_with_id = 'http://testserver/habitats/' + str(self.habitat.id) + '/'
+
 
     """
     Tests for HabitatSerializer

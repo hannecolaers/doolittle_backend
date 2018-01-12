@@ -1,23 +1,28 @@
 from django.urls import reverse
-from django.test import TestCase, Client, RequestFactory
+from django.test import TestCase
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient, APIRequestFactory
+from rest_framework.test import APIClient, APIRequestFactory
 import datetime
 
+from django.contrib.auth.models import User
 from employees.models import Employee
 from habitats.models import Habitat
 from squads.models import Squad, Membership
-from squads.serializers import SquadSerializer, MembershipSerializer
+from squads.serializers import SquadSerializer
+from squads.serializers import MembershipSerializer
 
-def create_squad_serializer(data, url, many = False):
+
+def create_squad_serializer(data, url, many=False):
     request = APIRequestFactory().get(url)
-    serializer = SquadSerializer(data, many = many, context = {'request': request})
+    serializer = SquadSerializer(data, many=many, context={'request': request})
     return serializer
 
-def create_membership_serializer(data, url, many = False):
+
+def create_membership_serializer(data, url, many=False):
     request = APIRequestFactory().get(url)
-    serializer = SquadSerializer(data, many = many, context = {'request': request})
+    serializer = MembershipSerializer(data, many=many, context={'request': request})
     return serializer
+
 
 class SquadTestCase(TestCase):
     def setUp(self):
@@ -30,6 +35,8 @@ class SquadTestCase(TestCase):
         }
         self.url_with_id = reverse('squad-detail', args=[self.squad.id])
         self.url_absolute_with_id = 'http://testserver/squads/' + str(self.squad.id) + '/'
+        user = User.objects.create(username='test')
+        self.client.force_authenticate(user=user)
 
     """
     Tests for SquadSerializer
@@ -215,9 +222,12 @@ class SquadTestCase(TestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
+
 class MembershipTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        user = User.objects.create(username='test')
+        self.client.force_authenticate(user=user)
         self.habitat = Habitat.objects.create(
             name='HabitatName'
         )
@@ -266,12 +276,6 @@ class MembershipTestCase(TestCase):
         serializer = create_membership_serializer(self.membership, '')
         self.assertSetEqual(set(serializer.data.keys()), {'squad', 'employee'})
 
-    def test_membership_serializer_id_name_field_content(self):
-        """
-        The name field of a squad should contain an id
-        """
-        serializer = create_membership_serializer(self.membership, '')
-        self.assertEqual(serializer.data['id'], self.membership.id)
 
     def test_membership_serializer_squad_field_content(self):
         """
@@ -291,9 +295,9 @@ class MembershipTestCase(TestCase):
         """
         The serializer should return [] when no objects are given
         """
-        membership = Membership.objects.none()
-        serialzer = create_membership_serializer(self.membership, '/', many = True)
-        self.assertEqual(serialzer.data, [])
+        empty_memberships = Membership.objects.none()
+        serializer = create_membership_serializer(empty_memberships, '/', many=True)
+        self.assertEqual(serializer.data, [])
 
     """
     Tests for the /memberships/<id>/ path
@@ -392,8 +396,8 @@ class MembershipTestCase(TestCase):
         A GET request on /memberships/ should return an array of squads
         """
         url = reverse('membership-list')
-        squadsemploees = Membership.objects.all()
-        serializer = create_membership_serializer(self.membership, url, many=True)
+        memberships = Membership.objects.all()
+        serializer = create_membership_serializer(memberships, url, many=True)
         response = self.client.get(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, serializer.data)
@@ -403,9 +407,9 @@ class MembershipTestCase(TestCase):
         A GET request on /memberships/ should still work with no results and return an empty array
         """
         url = reverse('membership-list')
-        squadsemploees = Membership.objects.none()
+        memberships = Membership.objects.none()
         response = self.client.get('/memberships/')
-        serializer = create_membership_serializer(self.membership, url, many=True)
+        serializer = create_membership_serializer(memberships, url, many=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_put_all_membership_returns_405(self):
