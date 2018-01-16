@@ -8,6 +8,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient, APIRequestFactory
 import datetime
+import json
 
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -59,7 +60,8 @@ class SquadTestCase(TestCase):
         """
         A POST request on /trainings/ should create a new training
         """
-        response = self.client.post('/trainings/', self.training_json_body, format="json")
+        headers = {'content-type': 'application/json'}
+        response = self.client.post('/trainings/', json=json.dumps(self.training_json_body), headers=headers, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     # def test_post_all_training_returns_400_when_bad_format(self):

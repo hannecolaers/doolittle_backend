@@ -33,11 +33,11 @@ def training_list(request):
         else:
             return JsonResponse(list_of_records, safe=False, status=status.HTTP_200_OK)
     elif request.method == 'POST':
-        logger.error(request.body)
-        received_json_data = json.loads(request.body)
-        logger.error(received_json_data)
-        if received_json_data != "" and received_json_data['date'] != "" and received_json_data['days'] != "":
-            return JsonResponse(received_json_data, safe=False, status=status.HTTP_201_CREATED)
+        received_json_data = json.loads(request.body.decode("utf-8"))
+        content = received_json_data['content']
+        if content != "" and content['date'] != "" and content['days'] != "":
+            worksheet.insert_row([content["date"], content["days"], content["firstname"], content["lastname"], content["team"], content["training"], content["company"], content["city"], content["cost"], content["invoice"], content["info"]], 1)
+            return JsonResponse(content, safe=False, status=status.HTTP_201_CREATED)
         else:
             return JsonResponse([], safe=False, status=status.HTTP_400_BAD_REQUEST)
     elif request.method == 'PUT':
