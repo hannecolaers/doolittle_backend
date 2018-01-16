@@ -1,8 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import api_view
-from rest_framework.decorators import parser_classes
+from rest_framework.views import APIView
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework import status
@@ -21,40 +20,32 @@ logger = logging.getLogger(__name__)
 # Get the Training spreadsheet file
 spreadsheet = client.open_by_key('1jEZR1uaEylQ05AohVvRpdQSWGOl7nDQE4oDtTWVAGkw')
 
-@api_view(['GET', 'PUT', 'DELETE', 'POST', 'PATCH'])
-@parser_classes((JSONParser,))
-def training_list(request):
-    """"
-    List all training
-    """
-    sheet = request.GET.get('sheet', 'Data')
-    worksheet = spreadsheet.worksheet(sheet)
-    if request.method == 'GET':
+
+class TrainingList(APIView):
+    def get(self, request, format=None):
+        sheet = request.GET.get('sheet', 'Data')
+        worksheet = spreadsheet.worksheet(sheet)
         list_of_records = worksheet.get_all_records()
         if list_of_records == "":
             return JsonResponse([], safe=False, status=status.HTTP_200_OK)
         else:
             return JsonResponse(list_of_records, safe=False, status=status.HTTP_200_OK)
-    elif request.method == 'POST':
-        logger.error("We got here")
+
+    def post(self, request, format=None):
+        sheet = request.GET.get('sheet', 'Data')
+        worksheet = spreadsheet.worksheet(sheet)
+        logger.error(request.data)
         worksheet.append_row([request.data.get("date"), request.data.get("days"), request.data.get("firstname"), request.data.get("lastname"), request.data.get("team"), request.data.get("training"), request.data.get("company"), request.data.get("city"), request.data.get("cost"), request.data.get("invoice"), request.data.get("info")])
         return JsonResponse("[]", safe=False, status=status.HTTP_201_CREATED)
-    elif request.method == 'PUT':
-        return JsonResponse([], safe=False, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-    elif request.method == 'PATCH':
-        return JsonResponse([], safe=False, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-    elif request.method == 'DELETE':
-        return JsonResponse([], safe=False, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-@csrf_exempt
-def training_id(request, id):
-    """"
-    Get a single training
-    """
-    sheet = request.GET.get('sheet', 'Data')
-    worksheet = spreadsheet.worksheet(sheet)
-    if request.method == 'GET':
+class TrainingDetail(APIView):
+    def get(self, request, id, format=None):
+        """
+        Get a single training
+        """
+        sheet = request.GET.get('sheet', 'Data')
+        worksheet = spreadsheet.worksheet(sheet)
         data = []
         row_value = worksheet.range(id, 1, id, 11)
         if row_value[0].value != "":
@@ -75,14 +66,13 @@ def training_id(request, id):
         return JsonResponse(data, safe=False)
 
 
-@csrf_exempt
-def training_employee_list(request, firstname, lastname):
-    """"
-    List all trainings from one person
-    """
-    sheet = request.GET.get('sheet', 'Data')
-    worksheet = spreadsheet.worksheet(sheet)
-    if request.method == 'GET':
+class TrainingAllDetail(APIView):
+    def get(self, request, firstname, lastname, format=None):
+        """
+        List all trainings from one person
+        """
+        sheet = request.GET.get('sheet', 'Data')
+        worksheet = spreadsheet.worksheet(sheet)
         cell_list = worksheet.findall(firstname)
         data = []
         for cell in cell_list:
