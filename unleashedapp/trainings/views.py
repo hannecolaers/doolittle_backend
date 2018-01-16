@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view
+from rest_framework.decorators import parser_classes
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework import status
@@ -19,7 +21,8 @@ logger = logging.getLogger(__name__)
 # Get the Training spreadsheet file
 spreadsheet = client.open_by_key('1jEZR1uaEylQ05AohVvRpdQSWGOl7nDQE4oDtTWVAGkw')
 
-@csrf_exempt
+@api_view(['GET', 'PUT', 'DELETE', 'POST', 'PATCH'])
+@parser_classes((JSONParser,))
 def training_list(request):
     """"
     List all training
@@ -33,13 +36,9 @@ def training_list(request):
         else:
             return JsonResponse(list_of_records, safe=False, status=status.HTTP_200_OK)
     elif request.method == 'POST':
-        received_json_data = json.loads(request.body.decode("utf-8"))
-        content = received_json_data['content']
-        if content != "" and content['date'] != "" and content['days'] != "":
-            worksheet.insert_row([content["date"], content["days"], content["firstname"], content["lastname"], content["team"], content["training"], content["company"], content["city"], content["cost"], content["invoice"], content["info"]], 1)
-            return JsonResponse(content, safe=False, status=status.HTTP_201_CREATED)
-        else:
-            return JsonResponse([], safe=False, status=status.HTTP_400_BAD_REQUEST)
+        logger.error("We got here")
+        worksheet.append_row([request.data.get("date"), request.data.get("days"), request.data.get("firstname"), request.data.get("lastname"), request.data.get("team"), request.data.get("training"), request.data.get("company"), request.data.get("city"), request.data.get("cost"), request.data.get("invoice"), request.data.get("info")])
+        return JsonResponse("[]", safe=False, status=status.HTTP_201_CREATED)
     elif request.method == 'PUT':
         return JsonResponse([], safe=False, status=status.HTTP_405_METHOD_NOT_ALLOWED)
     elif request.method == 'PATCH':
