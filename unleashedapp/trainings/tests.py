@@ -124,6 +124,30 @@ class SquadTestCase(TestCase):
         response = self.client.get('/trainings/999/?sheet=TestSheet')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_put_training_returns_201_when_correct(self):
+        """
+        A GET request on /trainings/ should return an array of trainings
+        """
+        self.ws.append_row(["1/1/2018",1,"Yannick","Franssen","Unleashed","Django","PXL","Hasselt",1.8,"Yep","Nope"])
+        response = self.client.put('/trainings/2/?sheet=TestSheet', json.dumps(self.training_json_partial), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        
+    def test_put_training_returns_404_when_requesting_1(self):
+        """
+        A GET request on /trainings/ should return an array of trainings
+        """
+        self.ws.append_row(["1/1/2018",1,"Yannick","Franssen","Unleashed","Django","PXL","Hasselt",1.8,"Yep","Nope"])
+        response = self.client.put('/trainings/1/?sheet=TestSheet', json.dumps(self.training_json_partial), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_put_training_returns_404_when_correct(self):
+        """
+        A GET request on /trainings/ should return an array of trainings
+        """
+        self.ws.append_row(["1/1/2018",1,"Yannick","Franssen","Unleashed","Django","PXL","Hasselt",1.8,"Yep","Nope"])
+        response = self.client.put('/trainings/999/?sheet=TestSheet', json.dumps(self.training_json_partial), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        
     def test_post_training_returns_405(self):
         """
         A GET request on /trainings/ should return an array of trainings
