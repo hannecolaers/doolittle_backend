@@ -35,8 +35,11 @@ class TrainingList(APIView):
         sheet = request.GET.get('sheet', 'Data')
         worksheet = spreadsheet.worksheet(sheet)
         data = json.loads(request.body.decode('utf-8'))
-        worksheet.append_row([data["date"], data["days"], data["firstname"], data["lastname"], data["team"], data["training"], data["company"], data["city"], data["cost"], data["invoice"], data["info"]])
-        return JsonResponse("[]", safe=False, status=status.HTTP_201_CREATED)
+        if "date" in data and "days" in data and "firstname" in data and "lastname" in data and "team" in data and "training" in data and "company" in data and "city" in data and "cost" in data and "invoice" in data and "info" in data:
+            worksheet.append_row([data["date"], data["days"], data["firstname"], data["lastname"], data["team"], data["training"], data["company"], data["city"], data["cost"], data["invoice"], data["info"]])
+            return JsonResponse(data, safe=False, status=status.HTTP_201_CREATED)
+        else:
+            return JsonResponse("[]", safe=False, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TrainingDetail(APIView):

@@ -63,13 +63,13 @@ class SquadTestCase(TestCase):
         response = self.client.post('/trainings/?sheet=TestSheet', json.dumps(self.training_json_body), content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    # def test_post_all_training_returns_400_when_bad_format(self):
-    #     """
-    #     A POST request on /trainings/ using the wrong format should return a 400 error
-    #     """
-    #     data = {'title': 'Newtraining'}
-    #     response = self.client.post('/trainings/?sheet=TestSheet', data, format="json")
-    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    def test_post_all_training_returns_400_when_bad_format(self):
+        """
+        A POST request on /trainings/ using the wrong format should return a 400 error
+        """
+        data = {'title': 'Newtraining'}
+        response = self.client.post('/trainings/?sheet=TestSheet', json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_put_all_training_returns_405(self):
         """
