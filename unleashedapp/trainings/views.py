@@ -47,28 +47,32 @@ class TrainingDetail(APIView):
         """
         GET a single training
         """
-        sheet = request.GET.get('sheet', 'Data')
-        worksheet = spreadsheet.worksheet(sheet)
-        result = []
-        row_value = worksheet.range(id, 1, id, 11)
-        if row_value[0].value != "":
-            result_json = {
-                "date": row_value[0].value,
-                "days": row_value[1].value,
-                "firstname": row_value[2].value,
-                "lastname": row_value[3].value,
-                "team": row_value[4].value,
-                "training": row_value[5].value,
-                "company": row_value[6].value,
-                "city": row_value[7].value,
-                "cost": row_value[8].value,
-                "invoice": row_value[9].value,
-                "info": row_value[10].value,
-            }
-            result.append(result_json)
-            return JsonResponse(result, safe=False)
-        else:
+        if id == "1":
+            # In this context, id 1 is the row of headings, this shouldn't be gettable
             return JsonResponse("[]", safe=False, status=status.HTTP_404_NOT_FOUND)
+        else:
+            sheet = request.GET.get('sheet', 'Data')
+            worksheet = spreadsheet.worksheet(sheet)
+            result = []
+            row_value = worksheet.range(id, 1, id, 11)
+            if row_value[0].value != "":
+                result_json = {
+                    "date": row_value[0].value,
+                    "days": row_value[1].value,
+                    "firstname": row_value[2].value,
+                    "lastname": row_value[3].value,
+                    "team": row_value[4].value,
+                    "training": row_value[5].value,
+                    "company": row_value[6].value,
+                    "city": row_value[7].value,
+                    "cost": row_value[8].value,
+                    "invoice": row_value[9].value,
+                    "info": row_value[10].value,
+                }
+                result.append(result_json)
+                return JsonResponse(result, safe=False)
+            else:
+                return JsonResponse("[]", safe=False, status=status.HTTP_404_NOT_FOUND)
 
     def put(self, request, id, format=None):
         """
