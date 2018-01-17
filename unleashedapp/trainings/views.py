@@ -134,6 +134,19 @@ class TrainingDetail(APIView):
             else:
                 return JsonResponse("[]", safe=False, status=status.HTTP_404_NOT_FOUND)
 
+    def delete(self, request, id):
+        """
+        DELETE a row from the spreadsheet
+        """
+        if id == "1":
+            # In this context, id 1 is the row of headings, this shouldn't be deleteable
+            return JsonResponse("[]", safe=False, status=status.HTTP_404_NOT_FOUND)
+        else:
+            sheet = request.GET.get('sheet', 'Data')
+            worksheet = spreadsheet.worksheet(sheet)
+            worksheet.delete_row(int(id))
+            return JsonResponse("[]", safe=False, status=status.HTTP_200_OK)
+
 
 class TrainingAllDetail(APIView):
     def get(self, request, firstname, lastname, format=None):
