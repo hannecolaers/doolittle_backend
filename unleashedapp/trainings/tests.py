@@ -23,12 +23,12 @@ class SquadTestCase(TestCase):
         self.sh = self.gclient.open_by_key('1jEZR1uaEylQ05AohVvRpdQSWGOl7nDQE4oDtTWVAGkw')
         self.ws = self.sh.worksheet('TestSheet')
         self.ws.resize(rows=1, cols=11)
-        self.training_json_body = {
+        self.training_json = {
             "date": "1/1/2018",
             "days": 1,
-            "firstname": "Yannick",
-            "lastname": "Franssen",
-            "team": "Unleashed",
+            "firstname": "Testuser",
+            "lastname": "Testname",
+            "team": "Care",
             "training": "Django",
             "company": "PXL",
             "city": "Hasselt",
@@ -36,7 +36,14 @@ class SquadTestCase(TestCase):
             "invoice": "Yep",
             "info": "Nope"
         }
-        self.training_json = [ self.training_json_body ]
+        self.training_json_partial = {
+            "date": "1/1/2018",
+            "days": 1,
+            "firstname": "Testuser",
+            "lastname": "Franssen",
+            "team": "Careful",
+            "training": "REST Framework"
+        }
 
     """
     Tests for the /trainings/ path
@@ -60,7 +67,7 @@ class SquadTestCase(TestCase):
         """
         A POST request on /trainings/ should create a new training
         """
-        response = self.client.post('/trainings/?sheet=TestSheet', json.dumps(self.training_json_body), content_type='application/json')
+        response = self.client.post('/trainings/?sheet=TestSheet', json.dumps(self.training_json), content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_post_all_training_returns_400_when_bad_format(self):
