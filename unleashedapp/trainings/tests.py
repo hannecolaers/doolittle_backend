@@ -98,3 +98,13 @@ class SquadTestCase(TestCase):
         """
         response = self.client.delete('/trainings/?sheet=TestSheet')
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    """
+    Tests for the /trainings/<id>/ path
+    """
+    def test_post_training_returns_405(self):
+        """
+        A GET request on /trainings/ should return an array of trainings
+        """
+        response = self.client.post('/trainings/2/?sheet=TestSheet', json.dumps(self.training_json), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
