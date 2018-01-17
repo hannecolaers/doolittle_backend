@@ -45,11 +45,11 @@ class TrainingList(APIView):
 class TrainingDetail(APIView):
     def get(self, request, id, format=None):
         """
-        Get a single training
+        GET a single training
         """
         sheet = request.GET.get('sheet', 'Data')
         worksheet = spreadsheet.worksheet(sheet)
-        data = []
+        result = []
         row_value = worksheet.range(id, 1, id, 11)
         if row_value[0].value != "":
             result_json = {
@@ -65,8 +65,50 @@ class TrainingDetail(APIView):
                 "invoice": row_value[9].value,
                 "info": row_value[10].value,
             }
-            data.append(result_json)
-        return JsonResponse(data, safe=False)
+            result.append(result_json)
+            return JsonResponse(result, safe=False)
+        else:
+            return JsonResponse("[]", safe=False, status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request, id, format=None):
+        """
+        PUT a row
+        """
+        sheet = request.GET.get('sheet', 'Data')
+        worksheet = spreadsheet.worksheet(sheet)
+        data = json.loads(request.body.decode('utf-8'))
+        # Get the data from the current row
+        result = []
+        row_value = worksheet.range(id, 1, id, 11)
+        if row_value[0].value != "":
+            if "date" in data or "days" in data or "firstname" in data or "lastname" in data or "team" in data or "training" in data or "company" in data or "city" in data or "cost" in data or "invoice" in data or "info" in data:
+                if "date" in data:
+                    worksheet.update_cell(id, 1, data['date'])
+                if "days" in data:
+                    worksheet.update_cell(id, 2, data['days'])
+                if "firstname" in data:
+                    worksheet.update_cell(id, 3, data['firstname'])
+                if "lastname" in data:
+                    worksheet.update_cell(id, 4, data['lastname'])
+                if "team" in data:
+                    worksheet.update_cell(id, 5, data['team'])
+                if "training" in data:
+                    worksheet.update_cell(id, 6, data['training'])
+                if "company" in data:
+                    worksheet.update_cell(id, 7, data['company'])
+                if "city" in data:
+                    worksheet.update_cell(id, 8, data['city'])
+                if "cost" in data:
+                    worksheet.update_cell(id, 9, data['cost'])
+                if "invoice" in data:
+                    worksheet.update_cell(id, 10, data['invoice'])
+                if "info" in data:
+                    worksheet.update_cell(id, 11, data['info'])
+                return JsonResponse("[]", safe=False, status=status.HTTP_201_CREATED)
+            else:
+                return JsonResponse("[]", safe=False, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return JsonResponse("[]", safe=False, status=status.HTTP_404_NOT_FOUND)
 
 
 class TrainingAllDetail(APIView):
