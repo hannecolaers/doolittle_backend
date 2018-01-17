@@ -72,9 +72,9 @@ class TrainingDetail(APIView):
 
     def put(self, request, id, format=None):
         """
-        PUT a row
+        PUT a row into the spreadsheet
         """
-        if id == 1:
+        if id == "1":
             # In this context, id 1 is the row of headings, this shouldn't be overwritten
             return JsonResponse("[]", safe=False, status=status.HTTP_404_NOT_FOUND)
         else:
