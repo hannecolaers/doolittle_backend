@@ -74,41 +74,45 @@ class TrainingDetail(APIView):
         """
         PUT a row
         """
-        sheet = request.GET.get('sheet', 'Data')
-        worksheet = spreadsheet.worksheet(sheet)
-        data = json.loads(request.body.decode('utf-8'))
-        # Get the data from the current row
-        result = []
-        row_value = worksheet.range(id, 1, id, 11)
-        if row_value[0].value != "":
-            if "date" in data or "days" in data or "firstname" in data or "lastname" in data or "team" in data or "training" in data or "company" in data or "city" in data or "cost" in data or "invoice" in data or "info" in data:
-                if "date" in data:
-                    worksheet.update_cell(id, 1, data['date'])
-                if "days" in data:
-                    worksheet.update_cell(id, 2, data['days'])
-                if "firstname" in data:
-                    worksheet.update_cell(id, 3, data['firstname'])
-                if "lastname" in data:
-                    worksheet.update_cell(id, 4, data['lastname'])
-                if "team" in data:
-                    worksheet.update_cell(id, 5, data['team'])
-                if "training" in data:
-                    worksheet.update_cell(id, 6, data['training'])
-                if "company" in data:
-                    worksheet.update_cell(id, 7, data['company'])
-                if "city" in data:
-                    worksheet.update_cell(id, 8, data['city'])
-                if "cost" in data:
-                    worksheet.update_cell(id, 9, data['cost'])
-                if "invoice" in data:
-                    worksheet.update_cell(id, 10, data['invoice'])
-                if "info" in data:
-                    worksheet.update_cell(id, 11, data['info'])
-                return JsonResponse("[]", safe=False, status=status.HTTP_201_CREATED)
-            else:
-                return JsonResponse("[]", safe=False, status=status.HTTP_400_BAD_REQUEST)
-        else:
+        if id == 1:
+            # In this context, id 1 is the row of headings, this shouldn't be overwritten
             return JsonResponse("[]", safe=False, status=status.HTTP_404_NOT_FOUND)
+        else:
+            sheet = request.GET.get('sheet', 'Data')
+            worksheet = spreadsheet.worksheet(sheet)
+            data = json.loads(request.body.decode('utf-8'))
+            # Get the data from the current row
+            result = []
+            row_value = worksheet.range(id, 1, id, 11)
+            if row_value[0].value != "":
+                if "date" in data or "days" in data or "firstname" in data or "lastname" in data or "team" in data or "training" in data or "company" in data or "city" in data or "cost" in data or "invoice" in data or "info" in data:
+                    if "date" in data:
+                        worksheet.update_cell(id, 1, data['date'])
+                    if "days" in data:
+                        worksheet.update_cell(id, 2, data['days'])
+                    if "firstname" in data:
+                        worksheet.update_cell(id, 3, data['firstname'])
+                    if "lastname" in data:
+                        worksheet.update_cell(id, 4, data['lastname'])
+                    if "team" in data:
+                        worksheet.update_cell(id, 5, data['team'])
+                    if "training" in data:
+                        worksheet.update_cell(id, 6, data['training'])
+                    if "company" in data:
+                        worksheet.update_cell(id, 7, data['company'])
+                    if "city" in data:
+                        worksheet.update_cell(id, 8, data['city'])
+                    if "cost" in data:
+                        worksheet.update_cell(id, 9, data['cost'])
+                    if "invoice" in data:
+                        worksheet.update_cell(id, 10, data['invoice'])
+                    if "info" in data:
+                        worksheet.update_cell(id, 11, data['info'])
+                    return JsonResponse("[]", safe=False, status=status.HTTP_201_CREATED)
+                else:
+                    return JsonResponse("[]", safe=False, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return JsonResponse("[]", safe=False, status=status.HTTP_404_NOT_FOUND)
 
 
 class TrainingAllDetail(APIView):
