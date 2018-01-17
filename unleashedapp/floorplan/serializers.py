@@ -27,8 +27,8 @@ class SpaceSerializer(serializers.HyperlinkedModelSerializer):
         unique_together = (("x", "y"),)
         validators = [
             UniqueTogetherValidator(
-                queryset = Space.objects.all(),
-                fields = ('x', 'y')
+                queryset=Space.objects.all(),
+                fields=('x', 'y')
             )
         ]
 
