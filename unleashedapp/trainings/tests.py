@@ -22,7 +22,7 @@ class SquadTestCase(TestCase):
         # Create a new, empty spreadsheet and worksheet
         self.sh = self.gclient.open_by_key('1jEZR1uaEylQ05AohVvRpdQSWGOl7nDQE4oDtTWVAGkw')
         self.ws = self.sh.worksheet('TestSheet')
-        #self.ws.resize(rows=1, cols=11)
+        self.ws.resize(rows=1, cols=11)
         self.training_json_body = {
             "date": "1/1/2018",
             "days": 1,
