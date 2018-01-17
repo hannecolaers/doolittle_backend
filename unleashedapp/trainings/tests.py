@@ -102,6 +102,28 @@ class SquadTestCase(TestCase):
     """
     Tests for the /trainings/<id>/ path
     """
+    def test_get_training_returns_200_when_found(self):
+        """
+        A GET request on /trainings/ should return an array of trainings
+        """
+        self.ws.append_row(["1/1/2018",1,"Yannick","Franssen","Unleashed","Django","PXL","Hasselt",1.8,"Yep","Nope"])
+        response = self.client.get('/trainings/2/?sheet=TestSheet')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+    def test_get_training_returns_404_when_requesting_1(self):
+        """
+        A GET request on /trainings/ should return an array of trainings
+        """
+        response = self.client.get('/trainings/1/?sheet=TestSheet')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        
+    def test_get_training_returns_404_when_not_found(self):
+        """
+        A GET request on /trainings/ should return an array of trainings
+        """
+        response = self.client.get('/trainings/999/?sheet=TestSheet')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_post_training_returns_405(self):
         """
         A GET request on /trainings/ should return an array of trainings
