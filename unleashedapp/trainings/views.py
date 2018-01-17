@@ -47,12 +47,12 @@ class TrainingDetail(APIView):
         """
         GET a single training
         """
-        if id == "1":
+        sheet = request.GET.get('sheet', 'Data')
+        worksheet = spreadsheet.worksheet(sheet)
+        if id == "1" or worksheet.row_count < int(id):
             # In this context, id 1 is the row of headings, this shouldn't be gettable
             return JsonResponse("[]", safe=False, status=status.HTTP_404_NOT_FOUND)
         else:
-            sheet = request.GET.get('sheet', 'Data')
-            worksheet = spreadsheet.worksheet(sheet)
             result = []
             row_value = worksheet.range(id, 1, id, 11)
             if row_value[0].value != "":
@@ -78,12 +78,12 @@ class TrainingDetail(APIView):
         """
         PUT a row into the spreadsheet
         """
-        if id == "1":
+        sheet = request.GET.get('sheet', 'Data')
+        worksheet = spreadsheet.worksheet(sheet)
+        if id == "1" or worksheet.row_count < int(id):
             # In this context, id 1 is the row of headings, this shouldn't be overwritten
             return JsonResponse("[]", safe=False, status=status.HTTP_404_NOT_FOUND)
         else:
-            sheet = request.GET.get('sheet', 'Data')
-            worksheet = spreadsheet.worksheet(sheet)
             data = json.loads(request.body.decode('utf-8'))
             # Get the data from the current row
             result = []
@@ -138,12 +138,12 @@ class TrainingDetail(APIView):
         """
         DELETE a row from the spreadsheet
         """
-        if id == "1":
+        sheet = request.GET.get('sheet', 'Data')
+        worksheet = spreadsheet.worksheet(sheet)
+        if id == "1" or worksheet.row_count < int(id):
             # In this context, id 1 is the row of headings, this shouldn't be deleteable
             return JsonResponse("[]", safe=False, status=status.HTTP_404_NOT_FOUND)
         else:
-            sheet = request.GET.get('sheet', 'Data')
-            worksheet = spreadsheet.worksheet(sheet)
             worksheet.delete_row(int(id))
             return JsonResponse("[]", safe=False, status=status.HTTP_200_OK)
 
