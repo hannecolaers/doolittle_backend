@@ -60,8 +60,7 @@ class SquadTestCase(TestCase):
         """
         A POST request on /trainings/ should create a new training
         """
-        headers = {'content-type': 'application/json'}
-        response = self.client.post('/trainings/?sheet=TestSheet', json=json.dumps(self.training_json_body), headers=headers, format="json")
+        response = self.client.post('/trainings/?sheet=TestSheet', json.dumps(self.training_json_body), content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     # def test_post_all_training_returns_400_when_bad_format(self):

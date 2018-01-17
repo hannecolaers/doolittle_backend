@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.renderers import JSONRenderer
@@ -34,8 +34,8 @@ class TrainingList(APIView):
     def post(self, request, format=None):
         sheet = request.GET.get('sheet', 'Data')
         worksheet = spreadsheet.worksheet(sheet)
-        logger.error(request.data)
-        worksheet.append_row([request.data.get("date"), request.data.get("days"), request.data.get("firstname"), request.data.get("lastname"), request.data.get("team"), request.data.get("training"), request.data.get("company"), request.data.get("city"), request.data.get("cost"), request.data.get("invoice"), request.data.get("info")])
+        data = json.loads(request.body.decode('utf-8'))
+        worksheet.append_row([data["date"], data["days"], data["firstname"], data["lastname"], data["team"], data["training"], data["company"], data["city"], data["cost"], data["invoice"], data["info"]])
         return JsonResponse("[]", safe=False, status=status.HTTP_201_CREATED)
 
 
