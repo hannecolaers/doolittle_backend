@@ -1,13 +1,5 @@
-from django.urls import reverse
-from django.test import TestCase, Client, RequestFactory
-from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.renderers import JSONRenderer
-from rest_framework.parsers import JSONParser
+from django.test import TestCase, Client
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient, APIRequestFactory
-import datetime
 import json
 
 import gspread
@@ -122,7 +114,6 @@ class SquadTestCase(TestCase):
         """
         A DELETE request on /trainings/<id>/ should return 404 when deleting unexisting training
         """
-        url = reverse('employee-detail', args=[999])
         response = self.client.delete('/trainings/999/?sheet=TestSheet')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
