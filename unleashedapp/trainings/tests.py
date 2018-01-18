@@ -1,4 +1,5 @@
 from django.test import TestCase, Client
+from django.conf import settings
 from rest_framework import status
 import json
 import gspread
@@ -8,7 +9,7 @@ class SquadTestCase(TestCase):
     def setUp(self):
         # Authenticate with Google
         scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-        creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+        creds = ServiceAccountCredentials.from_json_keyfile_name(settings.GOOGLE_CREDENTIALS, scope)
         self.gclient = gspread.authorize(creds)
         # Create a new, empty spreadsheet and worksheet
         self.sh = self.gclient.open_by_key('1jEZR1uaEylQ05AohVvRpdQSWGOl7nDQE4oDtTWVAGkw')

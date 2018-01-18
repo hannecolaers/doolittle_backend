@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework import status
 import gspread
@@ -8,7 +9,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 # Authenticate with Google
 scope = ['https://spreadsheets.google.com/feeds']
-creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name(settings.GOOGLE_CREDENTIALS, scope)
 client = gspread.authorize(creds)
 
 # Get the Training spreadsheet file
