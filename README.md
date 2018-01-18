@@ -40,6 +40,11 @@ DATABASES = {
 }
 ```
 
+## Google Spreadsheet access
+Some of the data can be found within spreadsheets hosted on Google's Google Docs platform. To access those spreadsheets, a json needs to be loaded whoms location has to be set in the ```GOOGLE_APPLICATION_CREDENTIALS```-variable on the user's system as ```/path/to/the/json/client_secret.json```.
+
+For demo purpose, this repository includes a ```client_secret.json``` at ```/unleashedapp/client_secret.json```. Therefor, the path can be set to ```c://path/to/the/github/project/root/unleashedapp/client_secret.json```.
+
 ## Run server
 To be executed in a command prompt within the virtual environment ```env``` to run the server on ```http://localhost:8000/```.
 
