@@ -45,10 +45,7 @@ class TrainingList(APIView):
     def get(self, request):
         worksheet = get_sheet(request.GET.get('sheet', 'Data'))
         list_of_records = worksheet.get_all_records()
-        if list_of_records == "":
-            return JsonResponse([], safe=False, status=status.HTTP_200_OK)
-        else:
-            return JsonResponse(list_of_records, safe=False, status=status.HTTP_200_OK)
+        return JsonResponse(list_of_records, safe=False, status=status.HTTP_200_OK)
 
     def post(self, request):
         worksheet = get_sheet(request.GET.get('sheet', 'Data'))
@@ -66,16 +63,17 @@ class TrainingDetail(APIView):
         GET a single training
         """
         worksheet = get_sheet(request.GET.get('sheet', 'Data'))
-        if id == "1" or worksheet.row_count < int(id): # 1 is the row of headings
+        if int(id) == 1: # 1 is the row of headings
+            return JsonResponse([], safe=False, status=status.HTTP_400_BAD_REQUEST)
+        elif worksheet.row_count < int(id):
             return JsonResponse([], safe=False, status=status.HTTP_404_NOT_FOUND)
         else:
-            result = []
             row_value = worksheet.range(int(id), 1, int(id), 11)
             if row_value[0].value == "":
                 return JsonResponse([], safe=False, status=status.HTTP_404_NOT_FOUND)
             else:
-                result_json = generate_json(row_value)
-                result.append(result_json)
+                result = []
+                result.append(generate_json(row_value))
                 return JsonResponse(result, safe=False)
 
     def put(self, request, id):
@@ -83,43 +81,44 @@ class TrainingDetail(APIView):
         PUT a row into the spreadsheet
         """
         worksheet = get_sheet(request.GET.get('sheet', 'Data'))
-        if id == "1" or worksheet.row_count < int(id): # 1 is the row of headings
+        if int(id) == 1: # 1 is the row of headings
+            return JsonResponse([], safe=False, status=status.HTTP_400_BAD_REQUEST)
+        elif worksheet.row_count < int(id):
             return JsonResponse([], safe=False, status=status.HTTP_404_NOT_FOUND)
         else:
             data = json.loads(request.body.decode('utf-8'))
-            result = []
             # Get the data from the current row
-            row_value = worksheet.range(id, 1, id, 11)
+            row_value = worksheet.range(int(id), 1, int(id), 11)
             if row_value[0].value == "":
                 return JsonResponse([], safe=False, status=status.HTTP_404_NOT_FOUND)
             else:
+                result = []
                 if validate_data_has_one(data):
                     if "date" in data:
-                        worksheet.update_cell(id, 1, data['date'])
+                        worksheet.update_cell(int(id), 1, data['date'])
                     if "days" in data:
-                        worksheet.update_cell(id, 2, data['days'])
+                        worksheet.update_cell(int(id), 2, data['days'])
                     if "firstname" in data:
-                        worksheet.update_cell(id, 3, data['firstname'])
+                        worksheet.update_cell(int(id), 3, data['firstname'])
                     if "lastname" in data:
-                        worksheet.update_cell(id, 4, data['lastname'])
+                        worksheet.update_cell(int(id), 4, data['lastname'])
                     if "team" in data:
-                        worksheet.update_cell(id, 5, data['team'])
+                        worksheet.update_cell(int(id), 5, data['team'])
                     if "training" in data:
-                        worksheet.update_cell(id, 6, data['training'])
+                        worksheet.update_cell(int(id), 6, data['training'])
                     if "company" in data:
-                        worksheet.update_cell(id, 7, data['company'])
+                        worksheet.update_cell(int(id), 7, data['company'])
                     if "city" in data:
-                        worksheet.update_cell(id, 8, data['city'])
+                        worksheet.update_cell(int(id), 8, data['city'])
                     if "cost" in data:
-                        worksheet.update_cell(id, 9, data['cost'])
+                        worksheet.update_cell(int(id), 9, data['cost'])
                     if "invoice" in data:
-                        worksheet.update_cell(id, 10, data['invoice'])
+                        worksheet.update_cell(int(id), 10, data['invoice'])
                     if "info" in data:
-                        worksheet.update_cell(id, 11, data['info'])
+                        worksheet.update_cell(int(id), 11, data['info'])
                     # Request the updated row
-                    row_value = worksheet.range(id, 1, id, 11)
-                    result_json = generate_json(row_value)
-                    result.append(result_json)
+                    row_value = worksheet.range(int(id), 1, int(id), 11)
+                    result.append(generate_json(row_value))
                     return JsonResponse(result, safe=False, status=status.HTTP_200_OK)
                 else:
                     return JsonResponse([], safe=False, status=status.HTTP_400_BAD_REQUEST)
@@ -129,7 +128,9 @@ class TrainingDetail(APIView):
         DELETE a row from the spreadsheet
         """
         worksheet = get_sheet(request.GET.get('sheet', 'Data'))
-        if id == "1" or worksheet.row_count < int(id): # 1 is the row of headings
+        if int(id) == 1: # 1 is the row of headings
+            return JsonResponse([], safe=False, status=status.HTTP_400_BAD_REQUEST)
+        elif worksheet.row_count < int(id):
             return JsonResponse([], safe=False, status=status.HTTP_404_NOT_FOUND)
         else:
             worksheet.delete_row(int(id))
@@ -144,12 +145,9 @@ class TrainingAllDetail(APIView):
         worksheet = get_sheet(request.GET.get('sheet', 'Data'))
         cell_list = worksheet.findall(firstname)
         data = []
-        if cell_list == []:
-            return JsonResponse([], safe=False, status=status.HTTP_404_NOT_FOUND)
-        else:
-            for cell in cell_list:
-                row_value = worksheet.range(cell.row, 1, cell.row, 11)
-                if row_value[2].value == firstname and row_value[3].value == lastname:
-                    result_json = generate_json(row_value)
-                    data.append(result_json)
-            return JsonResponse(data, safe=False, status=status.HTTP_200_OK)
+        for cell in cell_list:
+            row_value = worksheet.range(cell.row, 1, cell.row, 11)
+            if row_value[2].value == firstname and row_value[3].value == lastname:
+                result_json = generate_json(row_value)
+                data.append(result_json)
+        return JsonResponse(data, safe=False, status=status.HTTP_200_OK)
