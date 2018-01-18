@@ -46,6 +46,87 @@ class SquadTestCase(TestCase):
         }
 
     """
+    Tests for the /trainings/<id>/ path
+    """
+    '''     def test_get_training_returns_200_when_found(self):
+        """
+        A GET request on /trainings/<id>/ should return an array of trainings
+        """
+        self.ws.append_row(["1/1/2018",1,"Testuser","Testname","Care","Text","PXL","Hasselt",1.8,"Yep","Nope"])
+        response = self.client.get('/trainings/2/?sheet=TestSheet')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    '''
+    def test_get_training_returns_404_when_requesting_1(self):
+        """
+        A GET request on /trainings/<id>/ should return an array of trainings
+        """
+        response = self.client.get('/trainings/1/?sheet=TestSheet')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        
+    def test_get_training_returns_404_when_not_found(self):
+        """
+        A GET request on /trainings/<id>/ should return an array of trainings
+        """
+        response = self.client.get('/trainings/999/?sheet=TestSheet')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        
+    def test_post_training_returns_405(self):
+        """
+        A GET request on /trainings/<id>/ should return an array of trainings
+        """
+        response = self.client.post('/trainings/2/?sheet=TestSheet', json.dumps(self.training_json), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_put_training_returns_200_when_updated(self):
+        """
+        A GET request on /trainings/<id>/ should return an array of trainings
+        """
+        self.ws.append_row(["1/1/2018",1,"Testuser","Testname","Care","Text","PXL","Hasselt",1.8,"Yep","Nope"])
+        response = self.client.put('/trainings/2/?sheet=TestSheet', json.dumps(self.training_json_partial), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+    def test_put_training_returns_404_when_requesting_1(self):
+        """
+        A GET request on /trainings/<id>/ should return an array of trainings
+        """
+        self.ws.append_row(["1/1/2018",1,"Testuser","Testname","Care","Text","PXL","Hasselt",1.8,"Yep","Nope"])
+        response = self.client.put('/trainings/1/?sheet=TestSheet', json.dumps(self.training_json_partial), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_put_training_returns_404_when_not_found(self):
+        """
+        A GET request on /trainings/<id>/ should return an array of trainings
+        """
+        self.ws.append_row(["1/1/2018",1,"Testuser","Testname","Care","Text","PXL","Hasselt",1.8,"Yep","Nope"])
+        response = self.client.put('/trainings/999/?sheet=TestSheet', json.dumps(self.training_json_partial), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_put_training_returns_400_when_bad_format(self):
+        """
+        A POST request on /trainings/<id>/ using the wrong format should return a 400 error
+        """
+        self.ws.append_row(["1/1/2018",1,"Testuser","Testname","Care","Text","PXL","Hasselt",1.8,"Yep","Nope"])
+        data = {'title': 'Newtraining'}
+        response = self.client.put('/trainings/2/?sheet=TestSheet', json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_delete_training_returns_204_when_deleting(self):
+        """
+        A DELETE request on /trainings/<id>/ should delete a training
+        """
+        self.ws.append_row(["1/1/2018",1,"Testuser","Testname","Care","Text","PXL","Hasselt",1.8,"Yep","Nope"])
+        response = self.client.delete('/trainings/2/?sheet=TestSheet')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        
+    def test_delete_training_returns_404_when_not_found(self):
+        """
+        A DELETE request on /trainings/<id>/ should return 404 when deleting unexisting training
+        """
+        url = reverse('employee-detail', args=[999])
+        response = self.client.delete('/trainings/999/?sheet=TestSheet')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    """
     Tests for the /trainings/ path
     """
     def test_get_all_training_returns_200_when_found(self):
@@ -97,62 +178,6 @@ class SquadTestCase(TestCase):
         A DELETE request on /trainings/ should not be possible
         """
         response = self.client.delete('/trainings/?sheet=TestSheet')
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    """
-    Tests for the /trainings/<id>/ path
-    """
-    def test_get_training_returns_200_when_found(self):
-        """
-        A GET request on /trainings/</id> should return an array of trainings
-        """
-        self.ws.append_row(["1/1/2018",1,"Testuser","Testname","Care","Text","PXL","Hasselt",1.8,"Yep","Nope"])
-        response = self.client.get('/trainings/2/?sheet=TestSheet')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
-    def test_get_training_returns_404_when_requesting_1(self):
-        """
-        A GET request on /trainings/</id> should return an array of trainings
-        """
-        response = self.client.get('/trainings/1/?sheet=TestSheet')
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        
-    def test_get_training_returns_404_when_not_found(self):
-        """
-        A GET request on /trainings/</id> should return an array of trainings
-        """
-        response = self.client.get('/trainings/999/?sheet=TestSheet')
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    def test_put_training_returns_201_when_correct(self):
-        """
-        A GET request on /trainings/</id> should return an array of trainings
-        """
-        self.ws.append_row(["1/1/2018",1,"Testuser","Testname","Care","Text","PXL","Hasselt",1.8,"Yep","Nope"])
-        response = self.client.put('/trainings/2/?sheet=TestSheet', json.dumps(self.training_json_partial), content_type='application/json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        
-    def test_put_training_returns_404_when_requesting_1(self):
-        """
-        A GET request on /trainings/</id> should return an array of trainings
-        """
-        self.ws.append_row(["1/1/2018",1,"Testuser","Testname","Care","Text","PXL","Hasselt",1.8,"Yep","Nope"])
-        response = self.client.put('/trainings/1/?sheet=TestSheet', json.dumps(self.training_json_partial), content_type='application/json')
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    def test_put_training_returns_404_when_correct(self):
-        """
-        A GET request on /trainings/</id> should return an array of trainings
-        """
-        self.ws.append_row(["1/1/2018",1,"Testuser","Testname","Care","Text","PXL","Hasselt",1.8,"Yep","Nope"])
-        response = self.client.put('/trainings/999/?sheet=TestSheet', json.dumps(self.training_json_partial), content_type='application/json')
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        
-    def test_post_training_returns_405(self):
-        """
-        A GET request on /trainings/</id> should return an array of trainings
-        """
-        response = self.client.post('/trainings/2/?sheet=TestSheet', json.dumps(self.training_json), content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     """
