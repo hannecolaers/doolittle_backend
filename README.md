@@ -81,6 +81,6 @@ from django.core.urlresolvers import reverse
 with:
 try:
     from django.urls import reverse
- except ImportError:  # Will be removed in Django 2.0
+except ImportError:  # Will be removed in Django 2.0
     from django.core.urlresolvers import reverse
 ```
