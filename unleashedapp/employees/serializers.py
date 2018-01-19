@@ -1,4 +1,3 @@
-from django.utils.encoding import force_text
 from rest_framework import serializers, status
 from rest_framework.exceptions import APIException
 
@@ -18,7 +17,6 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     def create(self, validated_data):
         habitat_data = validated_data.pop('habitat')
         if Habitat.objects.filter(name=habitat_data["name"]).exists():
-            Habitat.objects.get(**habitat_data)
             habitat = Habitat.objects.get(name=habitat_data["name"])
             employee = Employee.objects.create(**validated_data)
             employee.habitat = habitat
@@ -35,8 +33,12 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
         employee.visible_site = validated_data.get('visible_site', employee.visible_site)
         if validated_data.get('habitat'):
             habitat_name = validated_data.get('habitat').get('name')
-            habitat = Habitat.objects.get(name=habitat_name)
-            employee.habitat = habitat
+            if Habitat.objects.filter(name=habitat_name).exists():
+                habitat = Habitat.objects.get(name=habitat_name)
+                employee.habitat = habitat
+            else:
+                raise InvalidHabitatError()
+        employee.save()
         return employee
 
 

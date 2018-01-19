@@ -163,6 +163,7 @@ class EmployeeTest(TestCase):
         response = self.client.post('/employees/', self.employee_json, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIn("id", response.data)
+        self.assertEqual(Employee.objects.get(id=self.employee.id).last_name, self.employee.last_name)
 
     def test_post_invalid_date(self):
         """
@@ -227,13 +228,46 @@ class EmployeeTest(TestCase):
         """
         response = self.client.put(self.url_with_id, self.employee_json, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Employee.objects.get(id=self.employee.id).first_name, "test")
 
     def test_put_employee_change_habitat(self):
         """
-            Ensure an employee can be updated with a PUT request
+            Ensure an employee's habitat can be updated with a PUT request
         """
-        response = self.client.put(self.url_with_id, self.employee_json, format="json")
+        Habitat.objects.create(
+            name="habitat2"
+        )
+        employee_json = {
+            "first_name": "test",
+            "last_name": "test",
+            "function": "testFunctie",
+            "start_date": "2017-12-13",
+            "visible_site": False,
+            "habitat": {
+                "name": "habitat2"
+            }
+        }
+        response = self.client.put(self.url_with_id, employee_json, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Employee.objects.get(id=self.employee.id).habitat.name, "habitat2")
+
+    def test_put_employee_change_invalid_habitat(self):
+        """
+            Ensure an employee's habitat can be updated with a PUT request
+        """
+        employee_json = {
+            "first_name": "test",
+            "last_name": "test",
+            "function": "testFunctie",
+            "start_date": "2017-12-13",
+            "visible_site": False,
+            "habitat": {
+                "name": "x"
+            }
+        }
+        response = self.client.put(self.url_with_id, employee_json, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Employee.objects.get(id=self.employee.id).habitat.name, "habitat1")
 
     def test_put_invalid_id(self):
         """
@@ -312,16 +346,18 @@ class EmployeeTest(TestCase):
         """
         response = self.client.patch(self.url_with_id, self.employee_json, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Employee.objects.get(id=self.employee.id).first_name, "test")
 
     def test_patch_employee_update_partial(self):
         """
             Ensure a certain field of an employee can be updated with a PATCH request
         """
         employee_json = {
-            'last_name': 'testAchternaam',
+            'last_name': 'xx',
         }
         response = self.client.patch(self.url_with_id, employee_json, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Employee.objects.get(id=self.employee.id).last_name, "xx")
 
     def test_patch_invalid_id(self):
         """
@@ -378,8 +414,10 @@ class EmployeeTest(TestCase):
         """
             Ensure a DELETE request of a valid employee id returns 200 OK
         """
+        count = Employee.objects.count()
         response = self.client.delete(self.url_with_id)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Employee.objects.count(), count-1)
 
     def test_delete_invalid_id(self):
         """

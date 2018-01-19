@@ -1,0 +1,44 @@
+[run]
+branch = True
+omit =
+    # Ignore migrations
+    */migrations/*
+
+    # Ignore deployment files
+    requirements/*
+
+    # Ignore docs
+    docs/*
+
+    # Ignore manage files
+    manage*
+
+    # Ignore admin files
+    uwa/*/admin.py
+
+    # Ignore settings files
+    */settings.*
+    */settings_*
+    */*_settings.*
+
+    # Ignore wsgi file
+    uwa/wsgi.py
+
+    # Ignore init file
+    uwa/__init__.py
+
+    # Ignore Celery config
+    uwa/celery.py
+
+    # Ignore test helper code
+    uwa/tests/client.py
+    uwa/tests/__init__.py
+
+[report]
+exclude_lines=
+    def __repr__
+    def __iter__
+    def __str__
+    raise NotImplementedError
+    pragma: no cover
+fail_under=100

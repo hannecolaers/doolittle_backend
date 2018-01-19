@@ -37,6 +37,12 @@ DATABASES = {
 }
 ```
 
+Update database:
+```
+python manage.py makemigrations
+python manage.py migrate
+```
+
 ## Google Spreadsheet access
 Some of the data can be found within spreadsheets hosted on Google's Google Docs platform. To access those spreadsheets, a json needs to be loaded whoms location has to be set in the ```GOOGLE_APPLICATION_CREDENTIALS```-variable on the user's system as ```/path/to/the/json/client_secret.json```.
 
@@ -55,4 +61,15 @@ To be executed in a command prompt within the virtual environment ```env``` to r
 
 ```
 python manage.py runserver
+```
+
+## Run coverage
+```
+coverage run manage.py test
+coverage report
+```
+
+html report:
+```
+coverage html
 ```
