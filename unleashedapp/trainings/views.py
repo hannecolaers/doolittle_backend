@@ -17,6 +17,7 @@ spreadsheet = client.open_by_key('1jEZR1uaEylQ05AohVvRpdQSWGOl7nDQE4oDtTWVAGkw')
 
 logger = logging.getLogger(__name__)
 
+
 def generate_json(row):
     return {
         "date": row[0].value,
@@ -32,11 +33,14 @@ def generate_json(row):
         "info": row[10].value
     }
 
+
 def get_sheet(sheet):
     return spreadsheet.worksheet(sheet)
 
+
 def validate_data_has_all(data):
     return True if "date" in data and "days" in data and "firstname" in data and "lastname" in data and "team" in data and "training" in data and "company" in data and "city" in data and "cost" in data and "invoice" in data and "info" in data else False
+
 
 def validate_data_has_one(data):
     return True if "date" in data or "days" in data or "firstname" in data or "lastname" in data or "team" in data or "training" in data or "company" in data or "city" in data or "cost" in data or "invoice" in data or "info" in data else False
@@ -52,7 +56,9 @@ class TrainingList(APIView):
         worksheet = get_sheet(request.GET.get('sheet', 'Data'))
         data = json.loads(request.body.decode('utf-8'))
         if validate_data_has_all(data):
-            worksheet.append_row([data["date"], data["days"], data["firstname"], data["lastname"], data["team"], data["training"], data["company"], data["city"], data["cost"], data["invoice"], data["info"]])
+            worksheet.append_row(
+                [data["date"], data["days"], data["firstname"], data["lastname"], data["team"], data["training"],
+                 data["company"], data["city"], data["cost"], data["invoice"], data["info"]])
             return JsonResponse(data, safe=False, status=status.HTTP_201_CREATED)
         else:
             return JsonResponse([], safe=False, status=status.HTTP_400_BAD_REQUEST)
@@ -64,7 +70,7 @@ class TrainingDetail(APIView):
         GET a single training
         """
         worksheet = get_sheet(request.GET.get('sheet', 'Data'))
-        if int(id) == 1: # 1 is the row of headings
+        if int(id) == 1:  # 1 is the row of headings
             return JsonResponse([], safe=False, status=status.HTTP_400_BAD_REQUEST)
         elif worksheet.row_count < int(id):
             return JsonResponse([], safe=False, status=status.HTTP_404_NOT_FOUND)
@@ -82,7 +88,7 @@ class TrainingDetail(APIView):
         PUT a row into the spreadsheet
         """
         worksheet = get_sheet(request.GET.get('sheet', 'Data'))
-        if int(id) == 1: # 1 is the row of headings
+        if int(id) == 1:  # 1 is the row of headings
             return JsonResponse([], safe=False, status=status.HTTP_400_BAD_REQUEST)
         elif worksheet.row_count < int(id):
             return JsonResponse([], safe=False, status=status.HTTP_404_NOT_FOUND)
@@ -129,7 +135,7 @@ class TrainingDetail(APIView):
         DELETE a row from the spreadsheet
         """
         worksheet = get_sheet(request.GET.get('sheet', 'Data'))
-        if int(id) == 1: # 1 is the row of headings
+        if int(id) == 1:  # 1 is the row of headings
             return JsonResponse([], safe=False, status=status.HTTP_400_BAD_REQUEST)
         elif worksheet.row_count < int(id):
             return JsonResponse([], safe=False, status=status.HTTP_404_NOT_FOUND)

@@ -84,7 +84,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'unleashed',
-        'USER': 'root'
+        'USER': 'root',
+        'PASSWORD':'wachtwoordUnleashed'
     }
 }
 

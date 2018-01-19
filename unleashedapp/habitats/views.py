@@ -1,12 +1,11 @@
-from rest_framework import generics
 from employees.models import Employee
 from employees.serializers import EmployeeSerializer
 from habitats.models import Habitat
 from habitats.serializers import HabitatSerializer
-from rest_framework import permissions
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
+
 
 class HabitatViewSet(viewsets.ModelViewSet):
     """
@@ -14,10 +13,11 @@ class HabitatViewSet(viewsets.ModelViewSet):
     """
     queryset = Habitat.objects.all()
     serializer_class = HabitatSerializer
-    
+
     """
     Provide a list of all employees within the selected habitat
     """
+
     @detail_route(methods=['get'])
     def employees(self, request, pk=None):
         habitat_id = self.kwargs.get('pk')
