@@ -1,4 +1,6 @@
-# Unleashed 2 backend
+# Unleashed 2 back end
+
+This project contains all files to setup the back end for the Unleashed app.
 
 ## Project setup
 
@@ -20,11 +22,6 @@ To execute in a command prompt within the virtual environment ```env``` to insta
 
 ```
 pip install -r requirements.txt
-```
-
-or
-
-```
 pip install -r requirements_test.txt
 ```
 
@@ -45,6 +42,19 @@ Update database:
 python manage.py makemigrations
 python manage.py migrate
 ```
+
+## Google Spreadsheet access
+Some of the data can be found within spreadsheets hosted on Google's Google Docs platform. To access those spreadsheets, a json needs to be loaded whoms location has to be set in the ```GOOGLE_APPLICATION_CREDENTIALS```-variable on the user's system as ```/path/to/the/json/client_secret.json```.
+
+For demo purpose, this repository includes a ```client_secret.json``` at ```/unleashedapp/client_secret.json```. Therefor, the path can be set to ```c://path/to/the/github/project/root/unleashedapp/client_secret.json```.
+
+### Windows
+1. Search for "Edit the system environment variables" and open it
+2. Choose "Environment Variables..."
+3. Under "User variables for ```<name>```", click "New..."
+4. Set ```GOOGLE_APPLICATION_CREDENTIALS``` as "Variable name" and ```c://path/to/the/github/project/root/unleashedapp/client_secret.json``` as "Variable path"
+5. Click "OK", "OK" and again "OK"
+6. Command Prompt or PowerShell needs to be restarted to load the new environment variables
 
 ## Run server
 To be executed in a command prompt within the virtual environment ```env``` to run the server on ```http://localhost:8000/```.

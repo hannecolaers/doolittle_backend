@@ -15,6 +15,8 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Google Spreadsheet credentials
+GOOGLE_CREDENTIALS = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
@@ -25,7 +27,7 @@ SECRET_KEY = '(t^0oar08&6&fej(^klay^hk^cyz6xpnqg+$#*1e&+$vbzv!=-'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['10.84.1.13']
 
 
 # Application definition
@@ -40,7 +42,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'squads',
     'habitats',
-    'employees'
+    'employees',
+    'trainings',
 ]
 
 MIDDLEWARE = [
