@@ -26,7 +26,6 @@ SECRET_KEY = '(t^0oar08&6&fej(^klay^hk^cyz6xpnqg+$#*1e&+$vbzv!=-'
 DEBUG = True
 
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -41,14 +40,19 @@ INSTALLED_APPS = [
     'rest_framework_social_oauth2',
 ]
 
+# While developing allow every host
+ALLOwED_HOSTS = ['*']
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
         'rest_framework_social_oauth2.authentication.SocialAuthentication',
     ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    )
+    # Only authenticated users can access the API
+    # Uncomment when login is implemented in frontend
+    # 'DEFAULT_PERMISSION_CLASSES': (
+    #     'rest_framework.permissions.IsAuthenticated',
+    # )
 }
 
 AUTHENTICATION_BACKENDS = (
@@ -59,7 +63,7 @@ AUTHENTICATION_BACKENDS = (
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '213697302597-ncg6a9elrdc97k4r4ra5ckql07dpehvm.apps.googleusercontent.com'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'bS9t-LK4hh3u43X8e7dLFmWu'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email',]
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -101,9 +105,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'unleashed',
-        'USER': 'hanne',
-        'PASSWORD': 'pxl',
-        'HOST': '192.168.241.138',
+        'USER': 'root'
     }
 }
 
