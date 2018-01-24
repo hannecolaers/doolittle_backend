@@ -25,7 +25,7 @@ SECRET_KEY = '(t^0oar08&6&fej(^klay^hk^cyz6xpnqg+$#*1e&+$vbzv!=-'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '10.84.134.15'
+
 ]
 
 # Application definition
@@ -78,8 +78,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'unleashed',
-        'USER': 'root',
-        'PASSWORD': 'wachtwoordUnleashed'
+        'USER': '',
+        'PASSWORD': ''
     }
 }
 

@@ -7,13 +7,15 @@ from floorplan.models import Room, Space
 class RoomSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Room
-        fields = ('id', 'name')
+        fields = ('id', 'name','type','color')
 
     def create(self, validated_data):
         return Room.objects.create(**validated_data)
 
     def update(self, room, validated_data):
         room.name = validated_data.get('name', room.name)
+        room.type = validated_data.get('type', room.type)
+        room.color = validated_data.get('color', room.color)
         room.save()
         return room
 

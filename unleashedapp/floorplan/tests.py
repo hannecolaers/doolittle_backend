@@ -21,53 +21,30 @@ class RoomTestCase(APITestCase):
         self.client.force_authenticate(user=user)
 
         self.room_name = 'ROOM-NAME'
+        self.room_type = 'Kitchen'
+        self.room_color = 'FFFFF'
         self.room_json = {
-            'name': self.room_name
+            'name': self.room_name,
+            'type': self.room_type,
+            'color': self.room_color
         }
 
         self.changed_room_name = 'CHANGED-ROOM-NAME'
+        self.changed_room_type = 'Empty'
+        self.changed_room_color = '00000'
         self.changed_room_json = {
-            'name': self.changed_room_name
+            'name': self.changed_room_name,
+            'type': self.changed_room_type,
+            'color': self.changed_room_color
         }
 
         self.room = Room.objects.create(
             name=self.room_name,
+            type=self.room_type,
+            color=self.room_color
         )
 
         self.url_with_id = reverse('room-detail', args=[self.room.id])
-
-    """
-     Tests for RoomSerializer
-    """
-
-    def test_room_serializer_expected_fields(self):
-        """
-        The serializer should only expect and accept the fields that have been set
-        """
-        serializer = create_room_serializer(self.room, '')
-        self.assertSetEqual(set(serializer.data.keys()), {'id', 'name'})
-
-    def test_room_serializer_id_field_content(self):
-        """
-        The id field of a room should contain a value
-        """
-        serializer = create_room_serializer(self.room, '')
-        self.assertEqual(serializer.data['id'], self.room.id)
-
-    def test_room_serializer_name_field_content(self):
-        """
-        The name field of a room should contain a value
-        """
-        serializer = create_room_serializer(self.room, '')
-        self.assertEqual(serializer.data['name'], self.room.name)
-
-    def test_room_serializer_returns_empty_when_no_rooms(self):
-        """
-        The serializer should return [] when no objects are given
-        """
-        empty_rooms = Room.objects.none()
-        serializer = create_room_serializer(empty_rooms, '/', many=True)
-        self.assertEqual(serializer.data, [])
 
     """
     Tests for the /rooms/{id} path
@@ -79,7 +56,8 @@ class RoomTestCase(APITestCase):
         """
         response = self.client.get(self.url_with_id, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {'id': self.room.id, 'name': self.room_name})
+        self.assertEqual(response.data,
+                         {'id': self.room.id, 'name': self.room_name, 'type': self.room_type, 'color': self.room_color})
 
     def test_get_room_returns_404_when_not_found(self):
         """
@@ -102,7 +80,9 @@ class RoomTestCase(APITestCase):
         response = self.client.get(self.url_with_id, format="json")
         response = self.client.put('/rooms/' + str(self.room.id) + '/', self.changed_room_json, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {'id': self.room.id, 'name': self.changed_room_name})
+        self.assertEqual(response.data,
+                         {'id': self.room.id, 'name': self.changed_room_name, 'type': self.changed_room_type,
+                          'color': self.changed_room_color})
 
     def test_put_room_returns_400_when_incorrect(self):
         """
@@ -153,7 +133,9 @@ class RoomTestCase(APITestCase):
         """
         response = self.client.patch('/rooms/' + str(self.room.id) + '/', self.changed_room_json, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {'id': self.room.id, 'name': self.changed_room_name})
+        self.assertEqual(response.data,
+                         {'id': self.room.id, 'name': self.changed_room_name, 'type': self.changed_room_type,
+                          'color': self.changed_room_color})
 
     def test_patch_room_returns_400_when_incorrect(self):
         """
