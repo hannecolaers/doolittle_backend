@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'floorplan.apps.FloorplanConfig'
+    'floorplan',
     'oauth2_provider',
     'social_django',
     'rest_framework_social_oauth2',

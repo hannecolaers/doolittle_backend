@@ -3,7 +3,7 @@ from django.db import models
 
 class Room(models.Model):
     name = models.CharField(max_length=30)
-    type = models.CharField(max_length=30, null=False, blank=False, default='Empty')
+    type = models.CharField(max_length=30, null=False, blank=False, default='Workspace')
     color = models.CharField(max_length=8, null=False, blank=False, default='FFFFFF')
 
 
