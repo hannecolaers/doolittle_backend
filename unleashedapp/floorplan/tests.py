@@ -22,7 +22,7 @@ class RoomTestCase(APITestCase):
 
         self.room_name = 'ROOM-NAME'
         self.room_type = 'Kitchen'
-        self.room_color = 'FFFFF'
+        self.room_color = 'FFFFFF'
         self.room_json = {
             'name': self.room_name,
             'type': self.room_type,
@@ -31,7 +31,7 @@ class RoomTestCase(APITestCase):
 
         self.changed_room_name = 'CHANGED-ROOM-NAME'
         self.changed_room_type = 'Empty'
-        self.changed_room_color = '00000'
+        self.changed_room_color = '000000'
         self.changed_room_json = {
             'name': self.changed_room_name,
             'type': self.changed_room_type,
@@ -604,7 +604,7 @@ class SpaceTestCase(APITestCase):
         response = self.client.post('/spaces/', self.space_json, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Space.objects.count(), 1)
-        space = Space.objects.first();
+        space = Space.objects.first()
         self.assertEqual(space.x, self.space_x)
         self.assertEqual(space.y, self.space_y)
         self.assertEqual(space.employee_id, self.space_employee_id)

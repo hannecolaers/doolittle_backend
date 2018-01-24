@@ -4,7 +4,7 @@ from django.db import models
 class Room(models.Model):
     name = models.CharField(max_length=30)
     type = models.CharField(max_length=30, null=False, blank=False, default='Empty')
-    color = models.CharField(max_length=8, null=False, blank=False, default='FFFFF')
+    color = models.CharField(max_length=8, null=False, blank=False, default='FFFFFF')
 
 
 class Space(models.Model):

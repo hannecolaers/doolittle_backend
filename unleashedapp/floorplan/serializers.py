@@ -7,7 +7,7 @@ from floorplan.models import Room, Space
 class RoomSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Room
-        fields = ('id', 'name','type','color')
+        fields = ('id', 'name', 'type', 'color')
 
     def create(self, validated_data):
         return Room.objects.create(**validated_data)
@@ -29,8 +29,8 @@ class SpaceSerializer(serializers.HyperlinkedModelSerializer):
         unique_together = (("x", "y"),)
         validators = [
             UniqueTogetherValidator(
-                queryset=Space.objects.all(),
-                fields=('x', 'y')
+                queryset = Space.objects.all(),
+                fields = ('x', 'y')
             )
         ]
 
