@@ -15,6 +15,9 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Google Spreadsheet credentials
+GOOGLE_CREDENTIALS = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
@@ -39,7 +42,39 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'floorplan.apps.FloorplanConfig'
+    'oauth2_provider',
+    'social_django',
+    'rest_framework_social_oauth2',
+    'squads',
+    'habitats',
+    'employees',
+    'trainings',
 ]
+
+# While developing allow every host
+ALLOWED_HOSTS = ['*']
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        'rest_framework_social_oauth2.authentication.SocialAuthentication',
+    ),
+    # Only authenticated users can access the API
+    # Uncomment when login is implemented in frontend
+    # 'DEFAULT_PERMISSION_CLASSES': (
+    #     'rest_framework.permissions.IsAuthenticated',
+    # )
+}
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',
+    'rest_framework_social_oauth2.backends.DjangoOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '213697302597-ncg6a9elrdc97k4r4ra5ckql07dpehvm.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'bS9t-LK4hh3u43X8e7dLFmWu'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -64,6 +99,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -80,6 +117,7 @@ DATABASES = {
         'NAME': 'unleashed',
         'USER': '',
         'PASSWORD': ''
+        'HOST': '',
     }
 }
 

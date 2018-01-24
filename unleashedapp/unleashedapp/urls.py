@@ -19,4 +19,9 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('floorplan.urls')),
+    path('', include('squads.urls')),
+    path('', include('habitats.urls')),
+    path('', include('employees.urls')),
+    path('', include('trainings.urls')),
+    path('auth/', include('rest_framework_social_oauth2.urls')),
 ]
