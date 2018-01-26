@@ -27,10 +27,6 @@ SECRET_KEY = '(t^0oar08&6&fej(^klay^hk^cyz6xpnqg+$#*1e&+$vbzv!=-'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-
-]
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -55,15 +51,12 @@ INSTALLED_APPS = [
 ALLOWED_HOSTS = ['*']
 
 REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 20,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
         'rest_framework_social_oauth2.authentication.SocialAuthentication',
     ),
-    # Only authenticated users can access the API
-    # Uncomment when login is implemented in frontend
-    # 'DEFAULT_PERMISSION_CLASSES': (
-    #     'rest_framework.permissions.IsAuthenticated',
-    # )
 }
 
 AUTHENTICATION_BACKENDS = (
@@ -115,9 +108,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'unleashed',
-        'USER': '',
-        'PASSWORD': ''
-        'HOST': '',
+        'USER': 'externhanna',
+        'PASSWORD': 'store users here',
+        'HOST': '10.128.8.73',
     }
 }
 

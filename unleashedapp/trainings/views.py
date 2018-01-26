@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 import gspread
 import json
 import logging
@@ -47,6 +48,8 @@ def validate_data_has_one(data):
 
 
 class TrainingList(APIView):
+    # permission_classes = (IsAuthenticated,)
+
     def get(self, request):
         worksheet = get_sheet(request.GET.get('sheet', 'Data'))
         list_of_records = worksheet.get_all_records()
@@ -65,6 +68,8 @@ class TrainingList(APIView):
 
 
 class TrainingDetail(APIView):
+    # permission_classes = (IsAuthenticated,)
+
     def get(self, request, id):
         """
         GET a single training
@@ -145,6 +150,8 @@ class TrainingDetail(APIView):
 
 
 class TrainingAllDetail(APIView):
+    # permission_classes = (IsAuthenticated,)
+
     def get(self, request, firstname, lastname):
         """
         List all trainings from one person

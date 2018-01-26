@@ -17,5 +17,5 @@ class Membership(models.Model):
     class Meta:
         unique_together = (('employee', 'squad'))
 
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=False, blank=True, default=1)
-    squad = models.ForeignKey(Squad, on_delete=models.CASCADE, null=False, blank=True, default=1)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=False, blank=False, default=1)
+    squad = models.ForeignKey(Squad, on_delete=models.CASCADE, null=False, blank=False, default=1)

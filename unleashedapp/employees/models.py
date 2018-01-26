@@ -1,10 +1,19 @@
+from django.core.validators import EmailValidator
 from django.db import models
 
 # Create your models here.
+from django.db.models.functions import Substr
+
 from habitats.models import Habitat
 
 
 class Employee(models.Model):
+    GENDER_CHOICES = (
+        ('M', 'Male'),
+        ('F', 'Female'),
+        ('X', 'X'),
+    )
+
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=40)
     function = models.CharField(max_length=50)
@@ -12,3 +21,16 @@ class Employee(models.Model):
     end_date = models.DateField(null=True, blank=True)
     visible_site = models.BooleanField()
     habitat = models.ForeignKey(Habitat, on_delete=models.SET_NULL, null=True, blank=True)
+    motivation = models.TextField(null=True, blank=True)
+    expectations = models.TextField(null=True, blank=True)
+    need_to_know = models.TextField(null=True, blank=True)
+    date_of_birth = models.DateField()
+    gender = models.CharField(choices=GENDER_CHOICES, max_length=1)
+    picture_url = models.URLField()
+    email = models.EmailField(validators=[EmailValidator(whitelist=['unleashed.be'])])
+
+    def save(self, *args, **kwargs):
+        self.first_name = Substr(self.first_name, 1, 1).upper() + Substr(self.first_name.lower(), 2)
+        self.last_name = Substr(self.last_name, 1, 1).upper() + Substr(self.last_name.lower(), 2)
+        return super(Employee, self).save(*args, **kwargs)
+

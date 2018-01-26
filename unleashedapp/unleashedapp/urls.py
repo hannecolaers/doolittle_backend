@@ -15,13 +15,24 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from employees.views import EmployeeViewSet
+from floorplan.views import RoomViewSet, SpaceViewSet
+from squads.views import SquadViewSet, MembershipViewSet
+from habitats.views import HabitatViewSet
+
+router = DefaultRouter()
+router.register(r'rooms', RoomViewSet)
+router.register(r'spaces', SpaceViewSet)
+router.register(r'squads', SquadViewSet)
+router.register(r'squads', MembershipViewSet)
+router.register(r'habitats', HabitatViewSet)
+router.register(r'employees', EmployeeViewSet)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('floorplan.urls')),
-    path('', include('squads.urls')),
-    path('', include('habitats.urls')),
-    path('', include('employees.urls')),
+    path('', include(router.urls)),
     path('', include('trainings.urls')),
     path('auth/', include('rest_framework_social_oauth2.urls')),
 ]
