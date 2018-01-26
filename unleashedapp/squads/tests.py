@@ -238,7 +238,14 @@ class MembershipTestCase(TestCase):
             start_date=datetime.date.today(),
             end_date=datetime.date.today(),
             visible_site=True,
-            habitat=self.habitat
+            habitat=self.habitat,
+            picture_url="https://link-to-picture.com/picture.jpg",
+            motivation="test motivation",
+            expectations="mijn verwachtingen",
+            need_to_know="need to know over mij",
+            date_of_birth=datetime.date.today(),
+            gender="F",
+            email="testvoornaam.testachternaam@unleashed.be"
         )
         self.squad = Squad.objects.create(
             name='SquadName'
@@ -260,7 +267,14 @@ class MembershipTestCase(TestCase):
                 "visible_site": False,
                 "habitat": {
                     "name": "HabitatName"
-                }
+                },
+                "picture_url": "https://link-to-picture2.com/picture.jpg",
+                "motivation": "motivation",
+                "expectations": "verwachtingen",
+                "need_to_know": "need to know",
+                "date_of_birth": "1995-10-15",
+                "gender": "M",
+                "email": "testvoornaam.testachternaam2@unleashed.be"
             }
         }
         self.url_with_id = reverse('membership-detail', args=[self.membership.id])
@@ -289,7 +303,7 @@ class MembershipTestCase(TestCase):
         The employee field of a employee should contain a employee
         """
         serializer = create_membership_serializer(self.membership, '')
-        self.assertEqual(serializer.data['employee']['first_name'], 'FirstName')
+        self.assertEqual(serializer.data['employee'], self.employee.id)
 
     def test_membership_serializer_returns_empty_when_no_memberships(self):
         """

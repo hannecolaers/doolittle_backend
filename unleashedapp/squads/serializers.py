@@ -2,7 +2,8 @@ from rest_framework import serializers
 from squads.models import Squad, Membership
 from employees.serializers import EmployeeSerializer
 
-class SquadSerializer(serializers.HyperlinkedModelSerializer):
+
+class SquadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Squad
         fields = ('id', 'name')
@@ -21,10 +22,8 @@ class SquadSerializer(serializers.HyperlinkedModelSerializer):
         instance.save()
         return instance
 
-class MembershipSerializer(serializers.HyperlinkedModelSerializer):
-    squad = SquadSerializer()
-    employee = EmployeeSerializer()
 
+class MembershipSerializer(serializers.ModelSerializer):
     class Meta:
         model = Membership
         fields = ('employee', 'squad')
@@ -44,10 +43,11 @@ class MembershipSerializer(serializers.HyperlinkedModelSerializer):
         instance.save()
         return instance
 
-class EmployeesInSquadSerializer(serializers.HyperlinkedModelSerializer):
+
+class EmployeesInSquadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Membership
-        fields = ('employee_id',)
+        fields = ('employee',)
 
     employee = EmployeeSerializer()
 

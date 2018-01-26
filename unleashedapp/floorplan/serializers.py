@@ -4,10 +4,10 @@ from rest_framework.exceptions import APIException
 from floorplan.models import Room, Space
 
 
-class RoomSerializer(serializers.HyperlinkedModelSerializer):
+class RoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
-        fields = ('id', 'name', 'type', 'color')
+        fields = '__all__'
 
     def create(self, validated_data):
         return Room.objects.create(**validated_data)
@@ -20,45 +20,27 @@ class RoomSerializer(serializers.HyperlinkedModelSerializer):
         return room
 
 
-class SpaceSerializer(serializers.HyperlinkedModelSerializer):
-    room = RoomSerializer()
-
+class SpaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Space
-        fields = ('x', 'y', 'employee_id', 'room')
+        fields = '__all__'
         unique_together = (("x", "y"),)
         validators = [
             UniqueTogetherValidator(
-                queryset = Space.objects.all(),
-                fields = ('x', 'y')
+                queryset=Space.objects.all(),
+                fields=('x', 'y')
             )
         ]
 
     def create(self, validated_data):
-        room_data = validated_data.pop('room')
-        if Room.objects.filter(name=room_data["name"]).exists():
-            room = Room.objects.get(name=room_data["name"])
-            validated_data.update({'room': room})
-            space = Space.objects.create(**validated_data)
-            return space
-        else:
-            raise InvalidRoomError()
+        space = Space.objects.create(**validated_data)
+        return space
 
     def update(self, space, validated_data):
         space.x = validated_data.get('x', space.x)
         space.y = validated_data.get('y', space.y)
-        space.employee_id = validated_data.get('employee_id', space.employee_id)
-        if validated_data.get('room'):
-            room_name = validated_data.get('room').get('name')
-            if Room.objects.filter(name=room_name).exists():
-                room = Room.objects.get(name=room_name)
-                space.room = room
-            else:
-                raise InvalidRoomError()
+        space.employee = validated_data.get('employee', space.employee)
+        space.room = validated_data.get('room', space.room)
         space.save()
         return space
 
-
-class InvalidRoomError(APIException):
-    status_code = status.HTTP_400_BAD_REQUEST
-    default_detail = "Room does not exist"

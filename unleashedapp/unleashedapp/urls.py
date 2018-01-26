@@ -25,7 +25,7 @@ router = DefaultRouter()
 router.register(r'rooms', RoomViewSet)
 router.register(r'spaces', SpaceViewSet)
 router.register(r'squads', SquadViewSet)
-router.register(r'squads', MembershipViewSet)
+router.register(r'memberships', MembershipViewSet)
 router.register(r'habitats', HabitatViewSet)
 router.register(r'employees', EmployeeViewSet)
 

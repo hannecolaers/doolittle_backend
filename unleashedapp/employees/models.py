@@ -2,7 +2,7 @@ from django.core.validators import EmailValidator
 from django.db import models
 
 # Create your models here.
-from django.db.models.functions import Substr
+from django.db.models.functions import Substr, Upper, Lower
 
 from habitats.models import Habitat
 
@@ -30,7 +30,6 @@ class Employee(models.Model):
     email = models.EmailField(validators=[EmailValidator(whitelist=['unleashed.be'])])
 
     def save(self, *args, **kwargs):
-        self.first_name = Substr(self.first_name, 1, 1).upper() + Substr(self.first_name.lower(), 2)
-        self.last_name = Substr(self.last_name, 1, 1).upper() + Substr(self.last_name.lower(), 2)
+        self.first_name = self.first_name[0].upper() + self.first_name[1:].lower()
         return super(Employee, self).save(*args, **kwargs)
 

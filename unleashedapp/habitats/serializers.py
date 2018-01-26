@@ -1,13 +1,11 @@
 from rest_framework import serializers
 from habitats.models import Habitat
 
-class HabitatSerializer(serializers.Serializer):
+
+class HabitatSerializer(serializers.ModelSerializer):
     class Meta:
         model = Habitat
-        fields = ('name')
-
-    id = serializers.IntegerField(read_only=True)
-    name = serializers.CharField(style={'base_template': 'textarea.html'})
+        fields = '__all__'
 
     def create(self, validated_data):
         """

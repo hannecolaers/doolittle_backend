@@ -1,11 +1,15 @@
+import datetime
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient, APIRequestFactory
 
+from employees.models import Employee
 from floorplan.models import Room, Space
 from floorplan.serializers import RoomSerializer, SpaceSerializer
 
 from django.urls import reverse
 from django.contrib.auth.models import User
+
+from habitats.models import Habitat
 
 
 def create_room_serializer(data, url, many=False):
@@ -90,13 +94,6 @@ class RoomTestCase(APITestCase):
         """
         response = self.client.put('/rooms/' + str(self.room.id) + '/', {'incorrectly-typed': self.changed_room_name},
                                    format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_put_room_returns_400_when_empty(self):
-        """
-        A PUT request on /rooms/{id} should return 400 when sent empty
-        """
-        response = self.client.put('/rooms/' + str(self.room.id) + '/', {}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_put_room_returns_400_when_invalid_value(self):
@@ -282,6 +279,10 @@ class SpaceTestCase(APITestCase):
         user = User.objects.create(username='test')
         self.client.force_authenticate(user=user)
 
+        self.habitat = Habitat.objects.create(
+            name="habitat1"
+        )
+
         self.room_name = 'lobby'
         self.room = Room.objects.create(
             name=self.room_name
@@ -292,35 +293,45 @@ class SpaceTestCase(APITestCase):
             name=self.room_name2
         )
 
+        self.employee = Employee.objects.create(
+            first_name='TestVoornaam',
+            last_name='TestAchternaam',
+            function='testFunctie',
+            start_date=datetime.date.today(),
+            visible_site=True,
+            habitat=self.habitat,
+            picture_url="https://link-to-picture.com/picture.jpg",
+            motivation="test motivation",
+            expectations="mijn verwachtingen",
+            need_to_know="need to know over mij",
+            date_of_birth=datetime.date.today(),
+            gender="F",
+            email="testvoornaam.testachternaam@unleashed.be"
+        )
+
         self.space_x = 100
         self.space_y = 200
-        self.space_employee_id = 1
         self.space_room = self.room
         self.space_json = {
             'x': self.space_x,
             'y': self.space_y,
-            'employee_id': self.space_employee_id,
-            'room': {
-                "name": self.room_name
-            }
+            'employee': self.employee.id,
+            'room': self.room.id
         }
         self.space = Space.objects.create(
             x=self.space_x,
             y=self.space_y,
-            employee_id=self.space_employee_id,
+            employee=self.employee,
             room=self.room
         )
 
         self.changed_space_x = 300
         self.changed_space_y = 400
-        self.changed_space_employee_id = 3
         self.changed_space_json = {
             'x': self.changed_space_x,
             'y': self.changed_space_y,
-            'employee_id': self.changed_space_employee_id,
-            'room': {
-                "name": self.room_name2
-            }
+            'employee': self.employee.id,
+            'room': self.room2.id
         }
 
         self.url_with_id = reverse('space-detail', args=[self.space.id])
@@ -334,7 +345,7 @@ class SpaceTestCase(APITestCase):
         The serializer should only expect and accept the fields that have been set
         """
         serializer = create_space_serializer(self.space, '')
-        self.assertSetEqual(set(serializer.data.keys()), {'x', 'y', 'employee_id', 'room'})
+        self.assertSetEqual(set(serializer.data.keys()), {'id', 'x', 'y', 'employee', 'room'})
 
     def test_space_serializer_x_field_content(self):
         """
@@ -350,19 +361,19 @@ class SpaceTestCase(APITestCase):
         serializer = create_space_serializer(self.space, '')
         self.assertEqual(serializer.data['y'], self.space.y)
 
-    def test_space_serializer_employee_id_field_content(self):
+    def test_space_serializer_employee_field_content(self):
         """
-        The employee_id field of a space should contain a value
+        The employee field of a space should contain a value
         """
         serializer = create_space_serializer(self.space, '')
-        self.assertEqual(serializer.data['employee_id'], self.space.employee_id)
+        self.assertEqual(serializer.data['employee'], self.space.employee.id)
 
     def test_space_serializer_room_name_field_content(self):
         """
         The room_id field of a space should contain a value
         """
         serializer = create_space_serializer(self.space, '')
-        self.assertEqual(serializer.data['room']['name'], self.room_name)
+        self.assertEqual(serializer.data['room'], self.room.id)
 
     def test_space_serializer_returns_empty_when_no_spaces(self):
         """
@@ -427,10 +438,17 @@ class SpaceTestCase(APITestCase):
             A PUT request on /spaces/{id} should return 400 when room does not exist
         """
         response = self.client.put('/spaces/' + str(self.space.id) + '/', {'x': self.space_x, 'y': self.space_y,
-                                                                           'employee_id': self.space_employee_id,
-                                                                           'room': {
-                                                                               "name": "x"
-                                                                           }}, format='json')
+                                                                           'employee': self.employee.id,
+                                                                           'room': '100'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_put_space_returns_400_when_invalid_employee(self):
+        """
+            A PUT request on /spaces/{id} should return 400 when room does not exist
+        """
+        response = self.client.put('/spaces/' + str(self.space.id) + '/', {'x': self.space_x, 'y': self.space_y,
+                                                                           'employee': '100',
+                                                                           'room': self.room.id}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_put_space_returns_400_when_incorrect(self):
@@ -440,22 +458,13 @@ class SpaceTestCase(APITestCase):
         response = self.client.put('/spaces/' + str(self.space.id) + '/', {'incorrectly-typed': ''}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_put_space_returns_400_when_empty_body(self):
-        """
-        A PUT request on /spaces/{id} should return a 400 when body is empty
-        """
-        response = self.client.put('/spaces/' + str(self.space.id) + '/', {}, format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
     def test_put_space_returns_400_when_invalid_value(self):
         """
         A PUT request on /spaces/{id} should return a 400 when using an invalid value
         """
         response = self.client.put('/spaces/' + str(self.space.id) + '/', {'x': 'a', 'y': self.changed_space_y,
-                                                                           'employee_id': self.changed_space_employee_id,
-                                                                           'room': {
-                                                                               "name": "desk"
-                                                                           }}, format='json')
+                                                                           'employee': self.employee.id,
+                                                                           'room': self.room2.id}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_put_space_returns_400_when_missing_required_field(self):
@@ -463,7 +472,7 @@ class SpaceTestCase(APITestCase):
         A PUT request on /spaces/{id} should return a 400 when missing a required field
         """
         response = self.client.put('/spaces/' + str(self.space.id) + '/',
-                                   {'y': self.changed_space_y, 'employee_id': self.changed_space_employee_id},
+                                   {'y': self.changed_space_y, 'room': self.room.id},
                                    format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -501,10 +510,17 @@ class SpaceTestCase(APITestCase):
             A PATCH request on /spaces/{id} should return 400 when room does not exist
         """
         response = self.client.patch('/spaces/' + str(self.space.id) + '/', {'x': self.space_x, 'y': self.space_y,
-                                                                             'employee_id': self.space_employee_id,
-                                                                             'room': {
-                                                                                 "name": "x"
-                                                                             }}, format='json')
+                                                                             'employee': self.employee.id,
+                                                                             'room': '100'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_patch_space_returns_400_when_invalid_employee(self):
+        """
+            A PATCH request on /spaces/{id} should return 400 when room does not exist
+        """
+        response = self.client.patch('/spaces/' + str(self.space.id) + '/', {'x': self.space_x, 'y': self.space_y,
+                                                                             'employee': '100',
+                                                                             'room': self.room.id}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_patch_space_returns_400_when_incorrect(self):
@@ -534,13 +550,6 @@ class SpaceTestCase(APITestCase):
         """
         response = self.client.patch('/spaces/-100/', self.space_json, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    def test_patch_space_returns_400_when_empty_body(self):
-        """
-        A PATCH request on /spaces/{id} should return 400 when body is empty
-        """
-        response = self.client.patch('/spaces/' + str(self.space.id) + '/', '{}', format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_delete_space_returns_204_when_deleting(self):
         """
@@ -607,7 +616,7 @@ class SpaceTestCase(APITestCase):
         space = Space.objects.first()
         self.assertEqual(space.x, self.space_x)
         self.assertEqual(space.y, self.space_y)
-        self.assertEqual(space.employee_id, self.space_employee_id)
+        self.assertEqual(space.employee, self.employee)
         self.assertEqual(space.room, self.space_room)
 
     def test_post_all_spaces_returns_400_when_invalid_attribute(self):
@@ -615,10 +624,8 @@ class SpaceTestCase(APITestCase):
         A POST request on /spaces/ using the wrong format should return a 400 error
         """
         response = self.client.post('/spaces/', {'x': 'a', 'y': self.changed_space_y,
-                                                 'incorrectly-typed': self.changed_space_employee_id,
-                                                 'room': {
-                                                     "name": "desk"
-                                                 }}, format='json')
+                                                 'incorrectly-typed': self.employee.id,
+                                                 'room': self.room.id}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(Space.objects.count(), 1)
 
@@ -627,10 +634,8 @@ class SpaceTestCase(APITestCase):
         A POST request on /spaces/ using the wrong format should return a 400 error
         """
         response = self.client.post('/spaces/', {'x': 'a', 'y': self.changed_space_y,
-                                                 'employee_id': self.changed_space_employee_id,
-                                                 'room': {
-                                                     "name": "desk"
-                                                 }}, format='json')
+                                                 'employee': self.employee.id,
+                                                 'room': self.room.id}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(Space.objects.count(), 1)
 
@@ -648,10 +653,19 @@ class SpaceTestCase(APITestCase):
         """
         response = self.client.post('/spaces/',
                                     {'x': self.changed_space_x, 'y': self.changed_space_y,
-                                     'employee_id': self.changed_space_employee_id,
-                                     'room': {
-                                         "name": "invalid-name"
-                                     }}, format='json')
+                                     'employee': self.employee.id,
+                                     'room': '100'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Space.objects.count(), 1)
+
+    def test_post_all_spaces_returns_400_when_invalid_employee(self):
+        """
+        A POST request on /spaces/ with an invalid room should return a 400 error
+        """
+        response = self.client.post('/spaces/',
+                                    {'x': self.changed_space_x, 'y': self.changed_space_y,
+                                     'employee': 100,
+                                     'room': self.room.id}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(Space.objects.count(), 1)
 
