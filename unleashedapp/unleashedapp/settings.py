@@ -48,7 +48,7 @@ INSTALLED_APPS = [
 ]
 
 # While developing allow every host
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['10.35.1.113']
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -106,9 +106,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'unleashed',
-        'USER': 'externhanna',
-        'PASSWORD': 'store users here',
-        'HOST': '10.128.8.73',
+        'USER': 'root',
     }
 }
 
