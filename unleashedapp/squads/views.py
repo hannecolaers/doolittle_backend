@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 
 
 class SquadViewSet(viewsets.ModelViewSet):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     """
     Provide an endpoint for POST, PUT, PATCH, DELETE and GET on /squads/ and /squads/<id>/
@@ -16,7 +16,7 @@ class SquadViewSet(viewsets.ModelViewSet):
     serializer_class = SquadSerializer
     
     """
-    Provide a list of all employees within the selected habitat
+    Provide a list of all employees within the selected squad
     """
     @detail_route(methods=['get'])
     def employees(self, request, pk=None):
@@ -27,7 +27,7 @@ class SquadViewSet(viewsets.ModelViewSet):
 
 
 class MembershipViewSet(viewsets.ModelViewSet):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     """
     Provide an endpoint for POST, PUT, PATCH, DELETE and GET on /squadsemployees/ and /squadsemployees/<id>/

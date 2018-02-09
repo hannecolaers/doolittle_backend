@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 
 
 class RoomViewSet(viewsets.ModelViewSet):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     """
     Provide an endpoint for POST, PUT, PATCH, DELETE and GET on /rooms/ and /rooms/<id>
@@ -15,7 +15,7 @@ class RoomViewSet(viewsets.ModelViewSet):
 
 
 class SpaceViewSet(viewsets.ModelViewSet):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     """
     Provide an endpoint for POST, PUT, PATCH, DELETE and GET on /spaces/ and /spaces/<id>

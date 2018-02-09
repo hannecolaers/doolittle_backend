@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 
 
 class EmployeeViewSet(viewsets.ModelViewSet):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     """
         Provide an endpoint for POST, PUT, PATCH, DELETE and GET on /employees/ and /employees/<id>/

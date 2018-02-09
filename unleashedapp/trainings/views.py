@@ -48,7 +48,7 @@ def validate_data_has_one(data):
 
 
 class TrainingList(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         worksheet = get_sheet(request.GET.get('sheet', 'Data'))
@@ -68,7 +68,7 @@ class TrainingList(APIView):
 
 
 class TrainingDetail(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, id):
         """
@@ -150,7 +150,7 @@ class TrainingDetail(APIView):
 
 
 class TrainingAllDetail(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, firstname, lastname):
         """
