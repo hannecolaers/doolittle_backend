@@ -108,7 +108,7 @@ DATABASES = {
         'NAME': 'unleashed',
         'USER': 'externhanna',
         'PASSWORD': 'store users here',
-        'HOST': '10.128.8.73',
+        'HOST': '10.128.8.73'
     }
 }
 
