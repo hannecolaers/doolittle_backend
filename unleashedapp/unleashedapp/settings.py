@@ -108,7 +108,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'unleashed',
-        'USER': 'root'
+        'USER': 'externhanna',
+        'PASSWORD': 'store users here',
+        'HOST': '10.128.8.73'
     }
 }
 
