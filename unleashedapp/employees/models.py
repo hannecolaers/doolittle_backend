@@ -33,3 +33,7 @@ class Employee(models.Model):
         self.first_name = self.first_name[0].upper() + self.first_name[1:].lower()
         return super(Employee, self).save(*args, **kwargs)
 
+
+    def __str__(self):
+        return "%s" % self.first_name + " " + self.last_name
+

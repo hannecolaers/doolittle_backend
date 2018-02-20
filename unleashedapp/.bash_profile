@@ -1,0 +1,1 @@
+export GOOGLE_APPLICATION_CREDENTIALS=/Users/Hanne/Desktop/3TIN/ITProject/doolittle_backend/unleashedapp/client_secret.json
