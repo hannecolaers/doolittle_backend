@@ -35,5 +35,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path('', include('trainings.urls')),
     path('auth/', include('rest_framework_social_oauth2.urls')),
-    path('^api-auth/', include('rest_framework.urls')),
+    path('api-auth/', include('rest_framework.urls')),
 ]
