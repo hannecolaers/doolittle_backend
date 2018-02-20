@@ -15,6 +15,8 @@ class Room(models.Model):
     type = models.CharField(choices=TYPE_CHOICES, max_length=30, null=False, blank=False, default=WORKSPACE)
     color = models.CharField(max_length=8, null=False, blank=False, default='FFFFFF')
 
+    def __str__(self):
+        return "%s" % self.name
 
 class Space(models.Model):
     x = models.IntegerField(default=0)
